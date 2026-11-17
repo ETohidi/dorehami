@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="دورهمی">
+<meta name="theme-color" content="#13111c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>جاسوس</title>
+<style>
+@font-face{font-family:"Vazirmatn";src:url("fonts/Vazirmatn.woff2") format("woff2");font-weight:100 900;font-display:swap}
+:root{--bg:#13111c;--card:#1f1c2e;--card2:#2a2640;--line:#3a3555;--text:#f5f2ff;--muted:#a49ec4;--ok:#22c986;--bad:#ff5a6a;--warn:#ffb648}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:"Vazirmatn",Tahoma,sans-serif;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
+body{padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px);background:radial-gradient(120% 60% at 50% -10%,var(--glow),transparent 70%),var(--bg);background-attachment:fixed}
+.wrap{max-width:520px;margin:0 auto;min-height:calc(100vh - 40px);display:flex;flex-direction:column}
+.screen{display:none;flex:1;flex-direction:column;gap:14px;animation:fade .25s ease}
+.screen.on{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font-size:30px;margin:6px 0 0;font-weight:900;text-align:center}
+.sub{color:var(--muted);text-align:center;margin:0 0 6px;font-size:15px}
+h2{font-size:17px;margin:0 0 10px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.row+.row{margin-top:14px}
+.lbl{font-size:16px;font-weight:600}
+.lbl small{display:block;color:var(--muted);font-weight:400;font-size:13px}
+.stepper{display:flex;align-items:center;gap:6px;background:var(--card2);border-radius:14px;padding:4px}
+.stepper button{width:40px;height:40px;border:0;border-radius:11px;background:var(--line);color:var(--text);font-size:22px;font-family:inherit;cursor:pointer}
+.stepper button:active{transform:scale(.92)}
+.stepper span{min-width:34px;text-align:center;font-size:19px;font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--card2);color:var(--text);padding:9px 14px;border-radius:999px;font-family:inherit;font-size:15px;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:17px;font-family:inherit;font-size:19px;font-weight:800;color:#fff;background:var(--card2);cursor:pointer;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 24px -8px var(--accent)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--muted);font-weight:600;font-size:16px;padding:13px}
+.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}
+.btn:disabled{opacity:.4}
+.grow{flex:1}
+.center{text-align:center}
+.big{font-size:44px;font-weight:900;line-height:1.3;text-align:center;margin:0}
+.muted{color:var(--muted)}
+.pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;color:var(--muted)}
+.toggle{position:relative;width:52px;height:30px;flex:none;border-radius:999px;background:var(--line);border:0;cursor:pointer;transition:background .2s}
+.toggle::after{content:"";position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:right .2s}
+.toggle.on{background:var(--accent)}.toggle.on::after{right:25px}
+input[type=text]{width:100%;background:var(--card2);border:1.5px solid var(--line);border-radius:14px;color:var(--text);font-family:inherit;font-size:17px;padding:12px 14px;outline:none;-webkit-user-select:text;user-select:text}
+input[type=text]:focus{border-color:var(--accent)}
+.names{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.name{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 8px 7px 14px;font-size:15px}
+.name button{border:0;background:var(--line);color:var(--text);width:24px;height:24px;border-radius:50%;font-size:14px;cursor:pointer;line-height:1}
+.reveal{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;border-radius:28px;padding:28px 18px;min-height:52vh}
+.cover{background:var(--card);border:2px dashed var(--line)}
+.shown{background:linear-gradient(160deg,var(--accent),var(--accent2))}
+.emoji{font-size:70px;line-height:1}
+.timer{direction:ltr;unicode-bidi:isolate;font-size:84px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.list{display:flex;flex-direction:column;gap:8px}
+.li{display:flex;justify-content:space-between;align-items:center;background:var(--card2);border-radius:14px;padding:11px 14px;font-size:16px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:9;padding:16px}
+.modal.on{display:flex}
+.modal .card{width:100%;max-width:520px;max-height:85vh;overflow:auto;padding-bottom:calc(env(safe-area-inset-bottom) + 16px)}
+.topbar{display:flex;justify-content:space-between;align-items:center}
+.icon{border:0;background:var(--card2);color:var(--text);width:40px;height:40px;border-radius:12px;font-size:18px;cursor:pointer;font-family:inherit}
+p{line-height:1.9}
+
+.home{display:flex;align-items:center;justify-content:center;text-decoration:none}
+
+:root{--accent:#ff4d6d;--accent2:#8b5cf6;--glow:rgba(255,77,109,.28)}
+.spy{background:linear-gradient(160deg,#2b2b3a,#0d0d14);border:2px solid var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section class="screen on" id="setup">
+  <div class="topbar"><a class="icon home" href="./" aria-label="خانه">🏠</a><span></span></div>
+  <div class="emoji center" style="margin-top:8px">🕵️</div>
+  <h1>جاسوس</h1>
+  <p class="sub">همه یک کلمه را می‌دانند، جز جاسوس!</p>
+  <div class="card">
+    <div class="row"><div class="lbl">تعداد بازیکنان</div><div class="stepper" id="sPlayers"></div></div>
+    <div class="row"><div class="lbl">تعداد جاسوس‌ها</div><div class="stepper" id="sSpies"></div></div>
+    <div class="row"><div class="lbl">زمان گفتگو<small>به دقیقه</small></div><div class="stepper" id="sTime"></div></div>
+    <div class="row"><div class="lbl">راهنما برای جاسوس<small>جاسوس دسته‌بندی را می‌بیند</small></div><button class="toggle" id="hint"></button></div>
+  </div>
+  <div class="card">
+    <h2>دسته‌بندی‌ها</h2>
+    <div class="chips" id="cats"></div>
+  </div>
+  <button class="btn primary" id="startBtn">شروع بازی</button>
+  <button class="btn ghost" onclick="$('#rules').classList.add('on')">قوانین بازی</button>
+</section>
+
+<section class="screen" id="pass">
+  <div class="topbar"><span class="pill" id="passCount"></span><button class="icon" onclick="confirmExit()">✕</button></div>
+  <div class="reveal cover" id="passBox">
+    <div class="emoji">📱</div>
+    <div class="big" id="passName"></div>
+    <p class="muted" style="margin:0">گوشی را به این بازیکن بدهید.<br>طوری نگاه کن که بقیه نبینند!</p>
+  </div>
+  <button class="btn primary" id="seeBtn">دیدن کارت من</button>
+</section>
+
+<section class="screen" id="card">
+  <div class="topbar"><span class="pill" id="cardCount"></span><span></span></div>
+  <div class="reveal shown" id="cardBox"></div>
+  <button class="btn" id="hideBtn">دیدم، پنهان کن ✓</button>
+</section>
+
+<section class="screen" id="play">
+  <div class="topbar"><span class="pill">زمان گفتگو</span><button class="icon" onclick="confirmExit()">✕</button></div>
+  <div class="card center">
+    <div class="muted">اولین سؤال را می‌پرسد:</div>
+    <div style="font-size:26px;font-weight:900;margin-top:4px" id="starter"></div>
+  </div>
+  <div class="grow" style="display:flex;flex-direction:column;justify-content:center">
+    <div class="timer" id="clock"></div>
+    <p class="center muted">به نوبت از هم سؤال بپرسید. جاسوس باید بدون لو رفتن، کلمه را حدس بزند!</p>
+  </div>
+  <button class="btn primary" id="timerBtn">شروع زمان</button>
+  <button class="btn" id="endBtn">پایان و نمایش جواب</button>
+</section>
+
+<section class="screen" id="result">
+  <div class="reveal shown" style="min-height:40vh">
+    <div class="muted" style="color:#ffffffcc">کلمه این دور</div>
+    <div class="big" id="resWord"></div>
+    <div class="pill" style="background:#0003;color:#fff;border:0" id="resCat"></div>
+  </div>
+  <div class="card center">
+    <div class="muted">🕵️ جاسوس(ها)</div>
+    <div style="font-size:24px;font-weight:900;margin-top:6px" id="resSpies"></div>
+  </div>
+  <div class="grow"></div>
+  <button class="btn primary" id="againBtn">دور بعد</button>
+  <button class="btn ghost" onclick="show('setup')">تنظیمات</button>
+</section>
+
+</div>
+
+<div class="modal" id="rules" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="card">
+    <h2>قوانین بازی جاسوس</h2>
+    <p>۱. گوشی دست‌به‌دست می‌چرخد و هر کس کارت خودش را می‌بیند. همه یک کلمه‌ی مشترک می‌بینند، به‌جز جاسوس که فقط می‌داند جاسوس است.</p>
+    <p>۲. بازیکنان به نوبت از هم سؤال می‌پرسند تا بفهمند چه کسی کلمه را نمی‌داند. سؤال‌ها نباید آن‌قدر واضح باشند که کلمه لو برود!</p>
+    <p>۳. هر وقت خواستید، یک نفر را متهم کنید و رأی بگیرید. اگر جاسوس پیدا شد، شهروندها برنده‌اند.</p>
+    <p>۴. جاسوس هر لحظه می‌تواند خودش را معرفی کند و کلمه را حدس بزند؛ اگر درست بگوید، او برنده است. اگر زمان تمام شود و جاسوس پیدا نشود، جاسوس برنده است.</p>
+    <button class="btn primary" onclick="$('#rules').classList.remove('on')">فهمیدم</button>
+  </div>
+</div>
+
+<div class="modal" id="exitM" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="card">
+    <h2>از این دور خارج می‌شوید؟</h2>
+    <button class="btn bad" onclick="stopTimer();$('#exitM').classList.remove('on');show('setup')">بله، خروج</button>
+    <div style="height:10px"></div>
+    <button class="btn ghost" onclick="$('#exitM').classList.remove('on')">ادامه‌ی بازی</button>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const fa=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0)}
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let _ac;
+function beep(f=880,d=.15,v=.25){try{_ac=_ac||new(window.AudioContext||window.webkitAudioContext)();if(_ac.state==='suspended')_ac.resume();const o=_ac.createOscillator(),g=_ac.createGain();o.type='sine';o.frequency.value=f;o.connect(g);g.connect(_ac.destination);const t=_ac.currentTime;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+function stepper(el,min,max,val,on){el.innerHTML='<button type="button">+</button><span></span><button type="button">−</button>';const sp=el.querySelector('span');const st={v:val,min,max,set(x){st.v=Math.max(st.min,Math.min(st.max,x));sp.textContent=fa(st.v);on&&on(st.v)}};const [p,m]=el.querySelectorAll('button');p.onclick=()=>st.set(st.v+1);m.onclick=()=>st.set(st.v-1);st.set(val);return st}
+function fmt(s){s=Math.max(0,s);return fa(Math.floor(s/60))+':'+fa(String(s%60).padStart(2,'0'))}
+function namesEditor(input,addBtn,box,key,min){let names=store.get(key,[]);function render(){box.innerHTML='';names.forEach((n,i)=>{const d=document.createElement('div');d.className='name';d.innerHTML='<span></span><button type="button">✕</button>';d.firstChild.textContent=n;d.lastChild.onclick=()=>{names.splice(i,1);save()};box.appendChild(d)});ed.onchange&&ed.onchange(names)}function save(){store.set(key,names);render()}function add(){const v=input.value.trim();if(!v)return;v.split(/[،,\n]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!names.includes(s))names.push(s)});input.value='';save();input.focus()}addBtn.onclick=add;input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});const ed={get names(){return names},render,onchange:null};setTimeout(render);return ed}
+
+const WORDS={
+places:{t:'مکان‌ها',e:'📍',w:['فرودگاه','بیمارستان','مدرسه','سینما','ساحل','کتابخانه','رستوران','باشگاه ورزشی','آرایشگاه','بانک','ایستگاه مترو','باغ‌وحش','استخر','کلانتری','نانوایی','جشن عروسی','کشتی تفریحی','کوه','پارک','موزه','هتل','داروخانه','بازار','شهربازی','پمپ بنزین','ایستگاه آتش‌نشانی','دانشگاه','قطار','سفارت','کافه','کمپ جنگلی','زیردریایی','ایستگاه فضایی','سیرک','سوپرمارکت','دندانپزشکی']},
+foods:{t:'غذاها',e:'🍲',w:['قورمه‌سبزی','قیمه','کباب کوبیده','جوجه‌کباب','فسنجان','آش رشته','تهدیگ','زرشک‌پلو با مرغ','ته‌چین','کله‌پاچه','دیزی','کشک بادمجان','میرزاقاسمی','سالاد الویه','کوکو سبزی','عدس‌پلو','باقالی‌پلو','شیرین‌پلو','حلیم','پیتزا','همبرگر','سوشی','ماکارونی','سمبوسه','فلافل','شله‌زرد','بستنی سنتی','فالوده','زولبیا بامیه','باقلوا','کتلت','دلمه','املت','ساندویچ کالباس']},
+animals:{t:'حیوانات',e:'🦁',w:['شیر','ببر','فیل','زرافه','میمون','پنگوئن','کانگورو','شتر','اسب','گاو','گوسفند','خرگوش','لاک‌پشت','مار','تمساح','عقاب','جغد','طوطی','دلفین','نهنگ','کوسه','هشت‌پا','زنبور','پروانه','مورچه','سنجاب','خرس','گرگ','روباه','گربه','سگ','اسب‌آبی','کرگدن','خفاش','طاووس','قورباغه','خروس','پلنگ']},
+jobs:{t:'شغل‌ها',e:'👩‍⚕️',w:['پزشک','دندانپزشک','پرستار','معلم','خلبان','آتش‌نشان','پلیس','آشپز','نانوا','آرایشگر','مهندس','برنامه‌نویس','وکیل','قاضی','خبرنگار','عکاس','بازیگر','خواننده','نقاش','کشاورز','راننده تاکسی','فضانورد','جراح','داروساز','مکانیک','لوله‌کش','برق‌کار','فوتبالیست','گارسون','باغبان','شعبده‌باز','دامپزشک','کتابدار','معمار','خیاط','مهماندار هواپیما']},
+objects:{t:'اشیا',e:'☂️',w:['یخچال','چتر','عینک','ساعت','کلید','موبایل','لپ‌تاپ','مسواک','آینه','قیچی','چراغ‌قوه','بالش','کتری','سماور','جاروبرقی','دوچرخه','گیتار','خودکار','کیف پول','کفش','دوربین','تلویزیون','اتو','صندلی','فرش','شمع','ماشین لباسشویی','هدفون','توپ','بادکنک','قوری','سشوار','کنترل تلویزیون','چمدان']},
+sports:{t:'ورزش‌ها',e:'⚽',w:['فوتبال','والیبال','بسکتبال','کشتی','تنیس','شنا','کوهنوردی','دوچرخه‌سواری','اسکی','بوکس','کاراته','تکواندو','یوگا','پینگ‌پنگ','بدمینتون','شطرنج','گلف','اسب‌سواری','موج‌سواری','اسکیت','وزنه‌برداری','ژیمناستیک','دوومیدانی','هندبال','بیلیارد','بولینگ','تیراندازی با کمان','شمشیربازی']},
+iran:{t:'ایران‌گردی',e:'🏛️',w:['تهران','اصفهان','شیراز','تبریز','مشهد','یزد','کیش','رشت','کرمان','همدان','قشم','کاشان','تخت جمشید','برج میلاد','میدان نقش جهان','حافظیه','سی‌وسه‌پل','ارگ بم','کاخ گلستان','قله دماوند','دریای خزر','خلیج فارس','باغ ارم','پاسارگاد','برج آزادی','بازار تبریز','چغازنبیل','قلعه رودخان','کویر لوت','ماسوله','آرامگاه سعدی','جزیره هرمز']}
+};
+const WORDS_EXTRA={
+actions:{t:'کارها و حرکات',e:'🕺',w:['مسواک زدن','رانندگی','شنا کردن','آشپزی','عکس گرفتن','رقصیدن','اتو کردن','ماهیگیری','چای ریختن','خمیازه کشیدن','عطسه کردن','سلفی گرفتن','گیتار زدن','تایپ کردن','جارو کردن','بستنی خوردن','سگ را بیرون بردن','چتر باز کردن','کادو باز کردن','بند کفش بستن','ریش تراشیدن','سوار اسب شدن','شعبده‌بازی','فوت کردن شمع تولد','قاچ کردن هندوانه','در صف ایستادن','بادکنک باد کردن','پختن نان','نخ کردن سوزن','بالا رفتن از نردبان','دعوای بالشی','لباس پهن کردن','چادر زدن','تخم‌مرغ شکستن','بیدار شدن با زنگ ساعت']},
+irmovies:{t:'فیلم و سریال ایرانی',e:'🎬',w:['جدایی نادر از سیمین','فروشنده','درباره الی','دایی جان ناپلئون','پایتخت','شهرزاد','مارمولک','اجاره‌نشین‌ها','خانه سبز','قصه‌های مجید','کلاه قرمزی','زیر آسمان شهر','مختارنامه','هزاردستان','گاو','طعم گیلاس','بچه‌های آسمان','سنتوری','لیلی با من است','مهمان مامان','شب‌های برره','ساعت خوش','آژانس شیشه‌ای','خانه دوست کجاست','یک حبه قند','کلاه قرمزی و پسرخاله','نون خ','بزرگ‌مرد کوچک','پاورچین','خانه به دوش']},
+movies:{t:'فیلم‌های خارجی',e:'🍿',w:['تایتانیک','پدرخوانده','هری پاتر','ارباب حلقه‌ها','شیرشاه','علاءالدین','ماتریکس','جنگ ستارگان','آواتار','مرد عنکبوتی','بتمن','شرک','داستان اسباب‌بازی','جومانجی','پارک ژوراسیک','تنها در خانه','فارست گامپ','رستگاری در شاوشنک','یخ‌زده','در جستجوی نمو','فرار از زندان','بازی تاج و تخت','دزدان دریایی کارائیب','سفید برفی','پینوکیو','کینگ کونگ','تام و جری','باب اسفنجی']},
+proverbs:{t:'ضرب‌المثل‌ها',e:'📜',w:['کار نیکو کردن از پر کردن است','دیگ به دیگ می‌گه روت سیاه','یک دست صدا نداره','جوجه رو آخر پاییز می‌شمرن','از این گوش می‌گیره از اون گوش در می‌کنه','شتر دیدی ندیدی','کاسه‌ای زیر نیم‌کاسه است','تا تنور داغه نون رو بچسبون','دود از کنده بلند می‌شه','سیلی نقد به از حلوای نسیه','قطره قطره جمع گردد وانگهی دریا شود','مرغ همسایه غازه','هر که بامش بیش برفش بیشتر','خواستن توانستن است','گربه دستش به گوشت نمی‌رسه می‌گه بو می‌ده','کوه به کوه نمی‌رسه آدم به آدم می‌رسه','دوری و دوستی','ماهی رو هر وقت از آب بگیری تازه‌ست','نوش‌دارو بعد از مرگ سهراب','آب در هاون کوبیدن','زیره به کرمان بردن','خربزه خوردی پای لرزش هم بنشین','یک سوزن به خودت بزن یک جوالدوز به مردم','آب که از سر گذشت چه یک وجب چه صد وجب','هر چه بگندد نمکش می‌زنند','آشپز که دو تا شد آش یا شور می‌شه یا بی‌نمک']}
+};
+
+const saved=store.get('spy',{p:5,s:1,t:5,h:false,c:['places','foods','animals','jobs','objects']});
+const P=stepper($('#sPlayers'),3,20,saved.p,v=>{if(window.S){S.max=Math.max(1,Math.floor((v-1)/2));S.set(S.v)}});
+const S=stepper($('#sSpies'),1,3,saved.s);window.S=S;S.max=Math.max(1,Math.floor((P.v-1)/2));S.set(S.v);
+const T=stepper($('#sTime'),1,15,saved.t);
+let hint=saved.h;const hb=$('#hint');hb.classList.toggle('on',hint);hb.onclick=()=>{hint=!hint;hb.classList.toggle('on',hint)};
+let cats=new Set(saved.c);
+const catBox=$('#cats');
+Object.entries(WORDS).forEach(([k,c])=>{const b=document.createElement('button');b.className='chip'+(cats.has(k)?' on':'');b.textContent=c.e+' '+c.t;b.onclick=()=>{cats.has(k)?cats.delete(k):cats.add(k);b.classList.toggle('on',cats.has(k))};catBox.appendChild(b)});
+
+let G={},used=store.get('spyUsed',[]);
+function newRound(){
+  const keys=[...cats];if(!keys.length){keys.push('places');cats.add('places')}
+  store.set('spy',{p:P.v,s:S.v,t:T.v,h:hint,c:keys});
+  let pool=[];keys.forEach(k=>WORDS[k].w.forEach(w=>pool.push([k,w])));
+  let fresh=pool.filter(x=>!used.includes(x[1]));if(!fresh.length){used=[];fresh=pool}
+  const [cat,word]=pick(fresh);used.push(word);store.set('spyUsed',used.slice(-150));
+  const spies=shuffle([...Array(P.v).keys()]).slice(0,S.v);
+  G={n:P.v,cat,word,spies,i:0,secs:T.v*60,left:T.v*60};
+  nextPass();
+}
+function nextPass(){
+  if(G.i>=G.n){startPlay();return}
+  $('#passName').textContent='بازیکن '+fa(G.i+1);
+  $('#passCount').textContent=fa(G.i+1)+' از '+fa(G.n);
+  show('pass');
+}
+$('#seeBtn').onclick=()=>{
+  const isSpy=G.spies.includes(G.i);const box=$('#cardBox');
+  box.className='reveal '+(isSpy?'spy':'shown');
+  box.innerHTML=isSpy
+   ?'<div class="emoji">🕵️</div><div class="big">تو جاسوسی!</div><p style="margin:0;color:#ffffffcc">کلمه را نمی‌دانی. از حرف‌های بقیه حدسش بزن و لو نرو.</p>'+(hint?'<div class="pill" style="background:#ffffff1a;color:#fff;border:0">دسته‌بندی: '+WORDS[G.cat].t+'</div>':'')
+   :'<div class="emoji">'+WORDS[G.cat].e+'</div><div style="color:#ffffffcc">کلمه‌ی تو:</div><div class="big"></div><div class="pill" style="background:#0003;color:#fff;border:0">'+WORDS[G.cat].t+'</div>';
+  if(!isSpy)box.querySelector('.big').textContent=G.word;
+  $('#cardCount').textContent='بازیکن '+fa(G.i+1);
+  show('card');
+};
+$('#hideBtn').onclick=()=>{G.i++;nextPass()};
+let tid=null;
+function startPlay(){$('#starter').textContent='بازیکن '+fa(1+Math.floor(Math.random()*G.n));G.left=G.secs;$('#clock').textContent=fmt(G.left);$('#clock').style.color='';$('#timerBtn').textContent='شروع زمان';show('play')}
+function stopTimer(){clearInterval(tid);tid=null}
+$('#timerBtn').onclick=()=>{
+  if(tid){stopTimer();$('#timerBtn').textContent='ادامه';return}
+  beep(660,.12);
+  $('#timerBtn').textContent='توقف';
+  tid=setInterval(()=>{G.left--;$('#clock').textContent=fmt(G.left);
+    if(G.left<=10&&G.left>0){beep(880,.08);$('#clock').style.color='var(--bad)'}
+    if(G.left<=0){stopTimer();beep(440,.6);setTimeout(()=>beep(330,.8),300);$('#timerBtn').textContent='زمان تمام شد!';}
+  },1000);
+};
+$('#endBtn').onclick=()=>{stopTimer();$('#resWord').textContent=G.word;$('#resCat').textContent=WORDS[G.cat].e+' '+WORDS[G.cat].t;$('#resSpies').textContent=G.spies.sort((a,b)=>a-b).map(i=>'بازیکن '+fa(i+1)).join(' و ');show('result')};
+$('#startBtn').onclick=newRound;$('#againBtn').onclick=newRound;
+function confirmExit(){$('#exitM').classList.add('on')}
+</script>
+
+<script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body>
+</html>
