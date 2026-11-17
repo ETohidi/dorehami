@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="دورهمی">
+<meta name="theme-color" content="#13111c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>جرأت یا حقیقت</title>
+<style>
+@font-face{font-family:"Vazirmatn";src:url("fonts/Vazirmatn.woff2") format("woff2");font-weight:100 900;font-display:swap}
+:root{--bg:#13111c;--card:#1f1c2e;--card2:#2a2640;--line:#3a3555;--text:#f5f2ff;--muted:#a49ec4;--ok:#22c986;--bad:#ff5a6a;--warn:#ffb648}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:"Vazirmatn",Tahoma,sans-serif;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
+body{padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px);background:radial-gradient(120% 60% at 50% -10%,var(--glow),transparent 70%),var(--bg);background-attachment:fixed}
+.wrap{max-width:520px;margin:0 auto;min-height:calc(100vh - 40px);display:flex;flex-direction:column}
+.screen{display:none;flex:1;flex-direction:column;gap:14px;animation:fade .25s ease}
+.screen.on{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font-size:30px;margin:6px 0 0;font-weight:900;text-align:center}
+.sub{color:var(--muted);text-align:center;margin:0 0 6px;font-size:15px}
+h2{font-size:17px;margin:0 0 10px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.row+.row{margin-top:14px}
+.lbl{font-size:16px;font-weight:600}
+.lbl small{display:block;color:var(--muted);font-weight:400;font-size:13px}
+.stepper{display:flex;align-items:center;gap:6px;background:var(--card2);border-radius:14px;padding:4px}
+.stepper button{width:40px;height:40px;border:0;border-radius:11px;background:var(--line);color:var(--text);font-size:22px;font-family:inherit;cursor:pointer}
+.stepper button:active{transform:scale(.92)}
+.stepper span{min-width:34px;text-align:center;font-size:19px;font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--card2);color:var(--text);padding:9px 14px;border-radius:999px;font-family:inherit;font-size:15px;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:17px;font-family:inherit;font-size:19px;font-weight:800;color:#fff;background:var(--card2);cursor:pointer;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 24px -8px var(--accent)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--muted);font-weight:600;font-size:16px;padding:13px}
+.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}
+.btn:disabled{opacity:.4}
+.grow{flex:1}
+.center{text-align:center}
+.big{font-size:44px;font-weight:900;line-height:1.3;text-align:center;margin:0}
+.muted{color:var(--muted)}
+.pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;color:var(--muted)}
+.toggle{position:relative;width:52px;height:30px;flex:none;border-radius:999px;background:var(--line);border:0;cursor:pointer;transition:background .2s}
+.toggle::after{content:"";position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:right .2s}
+.toggle.on{background:var(--accent)}.toggle.on::after{right:25px}
+input[type=text]{width:100%;background:var(--card2);border:1.5px solid var(--line);border-radius:14px;color:var(--text);font-family:inherit;font-size:17px;padding:12px 14px;outline:none;-webkit-user-select:text;user-select:text}
+input[type=text]:focus{border-color:var(--accent)}
+.names{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.name{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 8px 7px 14px;font-size:15px}
+.name button{border:0;background:var(--line);color:var(--text);width:24px;height:24px;border-radius:50%;font-size:14px;cursor:pointer;line-height:1}
+.reveal{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;border-radius:28px;padding:28px 18px;min-height:52vh}
+.cover{background:var(--card);border:2px dashed var(--line)}
+.shown{background:linear-gradient(160deg,var(--accent),var(--accent2))}
+.emoji{font-size:70px;line-height:1}
+.timer{direction:ltr;unicode-bidi:isolate;font-size:84px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.list{display:flex;flex-direction:column;gap:8px}
+.li{display:flex;justify-content:space-between;align-items:center;background:var(--card2);border-radius:14px;padding:11px 14px;font-size:16px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:9;padding:16px}
+.modal.on{display:flex}
+.modal .card{width:100%;max-width:520px;max-height:85vh;overflow:auto;padding-bottom:calc(env(safe-area-inset-bottom) + 16px)}
+.topbar{display:flex;justify-content:space-between;align-items:center}
+.icon{border:0;background:var(--card2);color:var(--text);width:40px;height:40px;border-radius:12px;font-size:18px;cursor:pointer;font-family:inherit}
+p{line-height:1.9}
+
+.home{display:flex;align-items:center;justify-content:center;text-decoration:none}
+
+:root{--accent:#14b8a6;--accent2:#6366f1;--glow:rgba(20,184,166,.25)}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice button{border:0;border-radius:24px;padding:30px 10px;font-family:inherit;font-size:24px;font-weight:900;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px}
+.choice button span{font-size:46px}
+.choice .t{background:linear-gradient(160deg,#3b82f6,#6366f1)}
+.choice .d{background:linear-gradient(160deg,#f43f5e,#f97316)}
+.choice button:active{transform:scale(.96)}
+.reveal.truth{background:linear-gradient(160deg,#3b82f6,#6366f1)}
+.reveal.dare{background:linear-gradient(160deg,#f43f5e,#f97316)}
+.prompt{font-size:27px;font-weight:800;line-height:1.75}
+.lvl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.lvl .chip{border-radius:16px;padding:12px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:14px}
+.lvl .chip b{font-size:26px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section class="screen on" id="setup">
+  <div class="topbar"><a class="icon home" href="./" aria-label="خانه">🏠</a><span></span></div>
+  <div class="emoji center" style="margin-top:8px">🎯</div>
+  <h1>جرأت یا حقیقت</h1>
+  <p class="sub">راستش را بگو... یا جرأتش را داشته باش!</p>
+  <div class="card">
+    <h2>بازیکنان</h2>
+    <div class="row" style="gap:8px"><input type="text" id="nameIn" placeholder="اسم بازیکن…" enterkeyhint="done"><button class="icon" id="addBtn" style="width:52px;height:48px;background:var(--accent)">＋</button></div>
+    <div class="names" id="names"></div>
+    <p class="muted" id="needMore" style="margin:8px 0 0;font-size:14px">حداقل ۲ بازیکن اضافه کنید.</p>
+  </div>
+  <div class="card">
+    <h2>سطح بازی</h2>
+    <div class="lvl" id="levels"></div>
+  </div>
+  <button class="btn primary" id="startBtn">شروع بازی</button>
+</section>
+
+<section class="screen" id="turn">
+  <div class="topbar"><button class="icon" onclick="show('setup')">⚙️</button><span class="pill" id="lvlTag"></span><button class="icon" onclick="openBoard()">🏆</button></div>
+  <div class="center" style="margin-top:30px">
+    <div class="muted">نوبت</div>
+    <div class="big" id="turnName"></div>
+  </div>
+  <div class="grow"></div>
+  <div class="choice">
+    <button class="t" onclick="draw('t')"><span>💬</span>حقیقت</button>
+    <button class="d" onclick="draw('d')"><span>🔥</span>جرأت</button>
+  </div>
+  <button class="btn" onclick="draw(Math.random()<.5?'t':'d')">🎲 شانسی</button>
+  <button class="btn ghost" onclick="nextTurn()">رد شدن از نوبت</button>
+</section>
+
+<section class="screen" id="card">
+  <div class="topbar"><span class="pill" id="cardWho"></span><button class="icon" id="swapBtn" title="سؤال دیگر">🔄</button></div>
+  <div class="reveal" id="cardBox">
+    <div style="font-size:20px;font-weight:800;color:#ffffffcc" id="cardType"></div>
+    <div class="prompt" id="cardText"></div>
+  </div>
+  <div class="choice" style="grid-template-columns:1fr 1fr">
+    <button class="btn ok" onclick="done(true)">انجام داد ✓</button>
+    <button class="btn bad" onclick="done(false)">نکرد ✗</button>
+  </div>
+</section>
+
+</div>
+
+<div class="modal" id="boardM" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="card">
+    <h2>🏆 امتیازها</h2>
+    <p class="muted" style="margin-top:0;font-size:14px">هر چالش انجام‌شده = ۱ امتیاز</p>
+    <div class="list" id="board"></div>
+    <div style="height:12px"></div>
+    <button class="btn primary" onclick="$('#boardM').classList.remove('on')">بستن</button>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const fa=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0)}
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let _ac;
+function beep(f=880,d=.15,v=.25){try{_ac=_ac||new(window.AudioContext||window.webkitAudioContext)();if(_ac.state==='suspended')_ac.resume();const o=_ac.createOscillator(),g=_ac.createGain();o.type='sine';o.frequency.value=f;o.connect(g);g.connect(_ac.destination);const t=_ac.currentTime;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+function stepper(el,min,max,val,on){el.innerHTML='<button type="button">+</button><span></span><button type="button">−</button>';const sp=el.querySelector('span');const st={v:val,min,max,set(x){st.v=Math.max(st.min,Math.min(st.max,x));sp.textContent=fa(st.v);on&&on(st.v)}};const [p,m]=el.querySelectorAll('button');p.onclick=()=>st.set(st.v+1);m.onclick=()=>st.set(st.v-1);st.set(val);return st}
+function fmt(s){s=Math.max(0,s);return fa(Math.floor(s/60))+':'+fa(String(s%60).padStart(2,'0'))}
+function namesEditor(input,addBtn,box,key,min){let names=store.get(key,[]);function render(){box.innerHTML='';names.forEach((n,i)=>{const d=document.createElement('div');d.className='name';d.innerHTML='<span></span><button type="button">✕</button>';d.firstChild.textContent=n;d.lastChild.onclick=()=>{names.splice(i,1);save()};box.appendChild(d)});ed.onchange&&ed.onchange(names)}function save(){store.set(key,names);render()}function add(){const v=input.value.trim();if(!v)return;v.split(/[،,\n]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!names.includes(s))names.push(s)});input.value='';save();input.focus()}addBtn.onclick=add;input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});const ed={get names(){return names},render,onchange:null};setTimeout(render);return ed}
+
+const Q={
+family:{
+t:['خجالت‌آورترین اتفاقی که در مدرسه برایت افتاد چه بود؟','اگر می‌توانستی یک روز جای یکی از حاضران باشی، چه کسی را انتخاب می‌کردی و چرا؟','بدترین غذایی که تا حالا خورده‌ای چه بوده؟','اگر یک ابرقدرت داشتی، چه بود و با آن چه می‌کردی؟','بچه که بودی دوست داشتی وقتی بزرگ شدی چه‌کاره شوی؟','بزرگ‌ترین شیطنتی که بچه بودی کردی و کسی نفهمید چه بود؟','کدام عادت بدت را هنوز ترک نکرده‌ای؟','اگر فقط سه چیز را بتوانی به یک جزیره‌ی دورافتاده ببری، چه می‌بری؟','از چه چیزی بیشتر از همه می‌ترسی؟','بهترین کادویی که تا حالا گرفته‌ای چه بوده؟','به نظرت {p} ده سال دیگر چه‌کاره می‌شود؟','اگر ناگهان خیلی پولدار شوی، اولین چیزی که می‌خری چیست؟','کدام کارتون یا فیلم دوران کودکی را هنوز دوست داری؟','عجیب‌ترین خوابی که دیده‌ای چه بوده؟','اگر یک روز نامرئی شوی، چه کار می‌کنی؟','کدام‌یک از حاضران بیشتر از همه تو را می‌خنداند؟','کدام کار خانه را از همه بیشتر بدت می‌آید؟','یک راز کوچک بگو که هیچ‌کس در این جمع نمی‌داند.','بهترین سفری که رفته‌ای کجا بوده؟','اگر می‌توانستی با یک شخصیت تاریخی شام بخوری، چه کسی را انتخاب می‌کردی؟','بهترین خاطره‌ات با {p} چیست؟','اگر یک روز رئیس کشور شوی، اولین قانونت چیست؟'],
+d:['با لهجه‌ی یک شهر دیگر، یک دقیقه درباره‌ی هوای امروز حرف بزن.','ادای یک حیوان را دربیاور تا بقیه حدس بزنند.','یک آهنگ معروف را فقط با «لا لا لا» بخوان تا بقیه حدس بزنند.','پنج بار سریع پشت سر هم بگو: «شیش سیخ جیگر سیخی شیش هزار».','تا نوبت بعدی‌ات، مثل گوینده‌ی اخبار حرف بزن.','یک شعر کودکانه را با حالت حماسی و پرسوز بخوان.','۳۰ ثانیه بدون خندیدن به چشم‌های {p} نگاه کن.','یک دقیقه مثل ربات راه برو و حرف بزن.','از هر کدام از حاضران یک تعریف صادقانه بکن.','۱۰ بار اسکات برو و همزمان الفبا را بشمار.','یک لطیفه تعریف کن؛ اگر کسی نخندید، یکی دیگر!','با چشم بسته چهره‌ی {p} را روی کاغذ بکش.','برای یکی از وسایل این اتاق یک تبلیغ تلویزیونی اجرا کن.','تا نوبت بعدی‌ات، هر جمله‌ات را با قافیه بگو.','یک رقص ۱۵ ثانیه‌ای اجرا کن.','مثل مجری یک برنامه‌ی تلویزیونی، {p} را به جمع معرفی کن.','سعی کن یک قاشق را ۱۰ ثانیه روی بینی‌ات نگه داری.','در ۱۵ ثانیه پنج میوه نام ببر که با «ب» یا «پ» شروع می‌شوند.','تا نوبت بعدی‌ات، هر جمله را با «قربونت برم» تمام کن.','بدون حرف زدن، یک فیلم را پانتومیم کن تا جمع حدس بزند.','صدای سه حیوان مختلف را پشت سر هم دربیاور.','با یک پا بایست و یک بیت شعر بخوان.']},
+friends:{
+t:['آخرین پیامی که فرستاده‌ای برای چه کسی بوده و چه نوشته‌ای؟','تا حالا از کسی در این جمع دلخور شده‌ای؟ سر چه؟','خنده‌دارترین چیزی که در اینترنت جست‌وجو کرده‌ای چه بوده؟','تا حالا وانمود کرده‌ای مریضی تا جایی نروی؟','اولین چیزی که در یک آدم توجهت را جلب می‌کند چیست؟','کدام اپلیکیشن بیشترین وقتت را می‌گیرد؟','آخرین باری که دروغ گفتی کی بود و چه گفتی؟','اگر مجبور بودی یک ماه با یکی از حاضران هم‌خانه شوی، چه کسی را انتخاب می‌کردی؟','بزرگ‌ترین پشیمانی‌ات چیست؟','تا حالا پیامی را اشتباهی برای کسی فرستاده‌ای؟ چه بود؟','به نظرت چه کسی در این جمع بیشتر از همه غر می‌زند؟','عجیب‌ترین عادتی که داری و کسی خبر ندارد چیست؟','اولین عشق دوران مدرسه‌ات چه کسی بود؟','به نظرت بدترین ویژگی اخلاقی‌ات چیست؟','اگر می‌توانستی یک چیز را در {p} عوض کنی، چه بود؟','آخرین عکس گالری گوشی‌ات چیست؟ توضیح بده!','تا حالا کادویی را که گرفته‌ای به کس دیگری کادو داده‌ای؟','خجالت‌آورترین آهنگی که دوستش داری چیست؟','چه چیزی هست که همه فکر می‌کنند بلدی ولی بلد نیستی؟','اولین برداشتت از {p} چه بود؟','بدترین قرار یا دیداری که داشته‌ای چطور گذشت؟'],
+d:['به سومین مخاطب گوشی‌ات پیام بده: «یهو یادت افتادم 😄».','یک پیام صوتی ۱۰ ثانیه‌ای با آواز برای یکی از دوستانت بفرست.','با لهجه‌ی خارجی، نمایشی از یک رستوران پیتزا سفارش بده.','۲۰ ثانیه مثل یک مدل روی خط فرضی کت‌واک کن.','بگذار {p} موهایت را هر طور که خواست درست کند.','تا نوبت بعدی‌ات، {p} را «قربان» صدا کن.','آخرین ایموجی‌ای که فرستاده‌ای را با صورتت نشان بده.','یک دقیقه درباره‌ی خودت با سوم‌شخص حرف بزن.','با صدای گوینده‌ی مستند حیات‌وحش، {p} را توصیف کن.','۳۰ ثانیه وقت داری جمع را بخندانی؛ اگر نشد، جمع یک جریمه برایت انتخاب می‌کند.','یک خاطره‌ی بامزه را فقط با پانتومیم تعریف کن.','یک تعریف اغراق‌آمیز و شاعرانه از کفش‌های {p} بکن.','یک آهنگ معروف را به سبک اپرا بخوان.','تا دو دور، هر بار کسی اسمت را گفت، بلند شو و تعظیم کن.','یک نامه‌ی تشکر خیلی رسمی برای {p} بنویس و بلند بخوان.','یک دقیقه برنامه‌ی آشپزی اجرا کن و طرز تهیه‌ی چای را توضیح بده.','ادای یکی از حاضران را دربیاور تا بقیه حدس بزنند کیست.','یک سلفی خیلی جدی با {p} بگیر و به جمع نشان بده.','۳۰ ثانیه بدون استفاده از حرف «الف» حرف بزن.','به نفر سمت راستت اجازه بده یک عکس پروفایل خنده‌دار برایت انتخاب کند (برای یک ساعت!).','یک بیت شعر حافظ یا سعدی را از حفظ بخوان؛ اگر بلد نیستی، یکی بساز!']},
+spicy:{
+t:['بزرگ‌ترین رازی که تا حالا نگه داشته‌ای چیست؟ (لازم نیست جزئیات بگویی)','تا حالا به دوست صمیمی‌ات حسادت کرده‌ای؟ سر چه؟','اگر می‌توانستی بدون هیچ عواقبی یک قانون را بشکنی، کدام بود؟','بدترین کاری که در یک رابطه انجام داده‌ای چه بوده؟','به چه کسی در این جمع بیشتر از همه اعتماد داری؟','آخرین باری که پشت سر کسی حرف زدی کی بود؟','تا حالا عاشق کسی شده‌ای که نباید می‌شدی؟','چیزی که از پدر و مادرت پنهان کرده‌ای و هنوز نمی‌دانند چیست؟','اگر قرار بود در آسانسور گیر کنی، با کدام‌یک از حاضران نمی‌خواستی گیر کنی؟','صادقانه: نظرت درباره‌ی تیپ امشب {p} چیست؟','بزرگ‌ترین دروغی که به یکی از حاضران گفته‌ای چه بوده؟','اگر یک روز بتوانی ذهن یکی از حاضران را بخوانی، ذهن چه کسی؟','تا حالا از کسی پول قرض گرفته‌ای و پس نداده‌ای؟','چه چیزی در گذشته‌ات هست که هنوز از آن خجالت می‌کشی؟','اگر فردا آخرین روز زندگی‌ات بود، به چه کسی چه می‌گفتی؟','آخرین باری که از ته دل از کسی عذرخواهی کردی کی بود؟','به نظرت چه کسی در این جمع از همه بیشتر تغییر کرده؟ چرا؟','کدام‌یک از حاضران را دوست داری بیشتر بشناسی؟','عجیب‌ترین چیزی که درباره‌ی {p} فکر کرده‌ای چه بوده؟'],
+d:['۳۰ ثانیه فهرست چت‌هایت را به {p} نشان بده (فقط اسم‌ها!).','آخرین عکس گالری‌ات را بدون انتخاب به جمع نشان بده.','به کسی که مدت‌هاست با او حرف نزده‌ای زنگ بزن و فقط بگو «یادت افتادم».','یک اعتراف عاشقانه‌ی نمایشی و پرسوز به یکی از وسایل خانه بکن.','آخرین پیام صوتی‌ای را که دریافت کرده‌ای بلند پخش کن.','یک دقیقه هر چیزی که {p} گفت را عیناً تکرار کن.','جای {p} بنشین و تا نوبت بعدی‌ات ادای او را دربیاور.','به آشپزی میزبان از ۱ تا ۱۰ نمره‌ی صادقانه بده و دلیلش را بگو.','یک قاشق از ترکیب خوراکی‌ای که جمع برایت درست می‌کند بخور.','تا دو دور، به هر سؤالی که از تو پرسیدند فقط «بله» جواب بده.','برای {p} یک شعر عاشقانه‌ی بداهه بخوان.','بگذار نفر سمت چپت یک کلمه انتخاب کند؛ تا آخر بازی باید در هر جمله‌ات باشد.','آخرین جست‌وجوی گوگلت را بلند بخوان.','برای یکی از حاضران یک پیام تشکر واقعی و صادقانه در گوشی بفرست.','یک کتاب روی سرت بگذار و یک دور اتاق راه برو.','یک سخنرانی انگیزشی پرشور یک‌دقیقه‌ای برای جمع اجرا کن.','سه نفر از جمع را از «باحال‌ترین» به «کم‌باحال‌ترین» رتبه‌بندی کن.','بگذار جمع یک پیام در گوشی‌ات بنویسد و تو برای کسی که انتخاب می‌کنی بفرستی.']}
+};
+const LV={family:['👨‍👩‍👧','خانوادگی'],friends:['😎','دوستانه'],spicy:['🌶️','پرهیجان']};
+let level=store.get('tdLevel','family');
+const lbox=$('#levels');
+Object.entries(LV).forEach(([k,[e,t]])=>{const b=document.createElement('button');b.className='chip'+(k===level?' on':'');b.innerHTML='<b>'+e+'</b>'+t;b.onclick=()=>{level=k;store.set('tdLevel',k);[...lbox.children].forEach(c=>c.classList.remove('on'));b.classList.add('on')};lbox.appendChild(b)});
+const ed=namesEditor($('#nameIn'),$('#addBtn'),$('#names'),'tdNames');
+ed.onchange=n=>{$('#needMore').style.display=n.length<2?'block':'none';$('#startBtn').disabled=n.length<2};
+let players=[],cur=0,scores={},decks={},C=null;
+$('#startBtn').onclick=()=>{
+  players=ed.names.slice();if(players.length<2)return;
+  players.forEach(p=>{if(scores[p]==null)scores[p]=0});
+  if(cur>=players.length)cur=0;
+  showTurn();
+};
+function showTurn(){$('#turnName').textContent=players[cur];$('#lvlTag').textContent=LV[level][0]+' '+LV[level][1];show('turn')}
+function nextTurn(){cur=(cur+1)%players.length;showTurn()}
+function drawText(type){
+  const key=level+type;
+  if(!decks[key]||!decks[key].length)decks[key]=shuffle(Q[level][type]);
+  let s=decks[key].pop();
+  const others=players.filter((_,i)=>i!==cur);
+  return s.replace(/\{p\}/g,()=>pick(others));
+}
+function draw(type){
+  beep(type==='t'?660:880,.12);
+  C={type,text:drawText(type)};
+  $('#cardBox').className='reveal '+(type==='t'?'truth':'dare');
+  $('#cardType').textContent=type==='t'?'💬 حقیقت':'🔥 جرأت';
+  $('#cardText').textContent=C.text;
+  $('#cardWho').textContent=players[cur];
+  show('card');
+}
+$('#swapBtn').onclick=()=>{C.text=drawText(C.type);$('#cardText').textContent=C.text};
+function done(ok){if(ok){scores[players[cur]]=(scores[players[cur]]||0)+1;beep(1046,.15)}else beep(220,.2);nextTurn()}
+function openBoard(){const b=$('#board');b.innerHTML='';players.slice().sort((a,c)=>(scores[c]||0)-(scores[a]||0)).forEach(p=>{const d=document.createElement('div');d.className='li';d.innerHTML='<span></span><b>'+fa(scores[p]||0)+'</b>';d.firstChild.textContent=p;b.appendChild(d)});$('#boardM').classList.add('on')}
+</script>
+
+<script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body>
+</html>
