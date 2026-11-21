@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="دورهمی">
+<meta name="theme-color" content="#13111c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>مشاعره</title>
+<style>
+@font-face{font-family:"Vazirmatn";src:url("fonts/Vazirmatn.woff2") format("woff2");font-weight:100 900;font-display:swap}
+:root{--bg:#13111c;--card:#1f1c2e;--card2:#2a2640;--line:#3a3555;--text:#f5f2ff;--muted:#a49ec4;--ok:#22c986;--bad:#ff5a6a;--warn:#ffb648}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:"Vazirmatn",Tahoma,sans-serif;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
+body{padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px);background:radial-gradient(120% 60% at 50% -10%,var(--glow),transparent 70%),var(--bg);background-attachment:fixed}
+.wrap{max-width:520px;margin:0 auto;min-height:calc(100vh - 40px);min-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px);display:flex;flex-direction:column}
+.screen{display:none;flex:1;flex-direction:column;gap:14px;animation:fade .25s ease}
+.screen.on{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font-size:30px;margin:6px 0 0;font-weight:900;text-align:center}
+.sub{color:var(--muted);text-align:center;margin:0 0 6px;font-size:15px}
+h2{font-size:17px;margin:0 0 10px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.row+.row{margin-top:14px}
+.lbl{font-size:16px;font-weight:600}
+.lbl small{display:block;color:var(--muted);font-weight:400;font-size:13px}
+.stepper{display:flex;align-items:center;gap:6px;background:var(--card2);border-radius:14px;padding:4px}
+.stepper button{width:40px;height:40px;border:0;border-radius:11px;background:var(--line);color:var(--text);font-size:22px;font-family:inherit;cursor:pointer}
+.stepper button:active{transform:scale(.92)}
+.stepper span{min-width:34px;text-align:center;font-size:19px;font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--card2);color:var(--text);padding:9px 14px;border-radius:999px;font-family:inherit;font-size:15px;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:17px;font-family:inherit;font-size:19px;font-weight:800;color:#fff;background:var(--card2);cursor:pointer;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 24px -8px var(--accent)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--muted);font-weight:600;font-size:16px;padding:13px}
+.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}
+.btn:disabled{opacity:.4}
+.grow{flex:1}
+.center{text-align:center}
+.big{font-size:clamp(30px,8.5vw,42px);font-weight:900;line-height:1.3;text-align:center;margin:0}
+.muted{color:var(--muted)}
+.pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;color:var(--muted)}
+.toggle{position:relative;width:52px;height:30px;flex:none;border-radius:999px;background:var(--line);border:0;cursor:pointer;transition:background .2s}
+.toggle::after{content:"";position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:right .2s}
+.toggle.on{background:var(--accent)}.toggle.on::after{right:25px}
+input[type=text]{width:100%;background:var(--card2);border:1.5px solid var(--line);border-radius:14px;color:var(--text);font-family:inherit;font-size:17px;padding:12px 14px;outline:none;-webkit-user-select:text;user-select:text}
+input[type=text]:focus{border-color:var(--accent)}
+.names{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.name{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 8px 7px 14px;font-size:15px}
+.name button{border:0;background:var(--line);color:var(--text);width:24px;height:24px;border-radius:50%;font-size:14px;cursor:pointer;line-height:1}
+.reveal{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;border-radius:28px;padding:20px 16px;min-height:min(46vh,380px)}
+.cover{background:var(--card);border:2px dashed var(--line)}
+.shown{background:linear-gradient(160deg,var(--accent),var(--accent2))}
+.emoji{font-size:58px;line-height:1}
+.timer{direction:ltr;unicode-bidi:isolate;font-size:84px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.list{display:flex;flex-direction:column;gap:8px}
+.li{display:flex;justify-content:space-between;align-items:center;background:var(--card2);border-radius:14px;padding:11px 14px;font-size:16px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:9;padding:16px}
+.modal.on{display:flex}
+.modal .card{width:100%;max-width:520px;max-height:85vh;overflow:auto;padding-bottom:calc(env(safe-area-inset-bottom) + 16px)}
+.topbar{display:flex;justify-content:space-between;align-items:center}
+.icon{border:0;background:var(--card2);color:var(--text);width:40px;height:40px;border-radius:12px;font-size:18px;cursor:pointer;font-family:inherit}
+p{line-height:1.9}
+
+.home{display:flex;align-items:center;justify-content:center;text-decoration:none}
+
+:root{--accent:#d97706;--accent2:#9d174d;--glow:rgba(217,119,6,.28)}
+.letter{width:120px;height:120px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:72px;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 10px 30px -10px var(--accent)}
+.lgrid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px}
+.lgrid button{aspect-ratio:1;border:1.5px solid var(--line);background:var(--card2);color:var(--text);border-radius:10px;font-family:inherit;font-size:19px;font-weight:800;cursor:pointer;padding:0}
+.lgrid button:active{background:var(--accent)}
+.plist{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.pp{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--card2);border:1px solid var(--line)}
+.pp.cur{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.pp.out{opacity:.35;text-decoration:line-through}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hint{background:var(--card2);border-radius:14px;padding:12px 14px;font-size:18px;font-weight:700;line-height:1.9;text-align:center}
+.timer.small{font-size:56px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section class="screen on" id="setup">
+  <div class="topbar"><a class="icon home" href="./" aria-label="خانه">🏠</a><span></span></div>
+  <div class="emoji center" style="margin-top:8px">📜</div>
+  <h1>مشاعره</h1>
+  <p class="sub">بیتی بخوان که با آخرین حرفِ بیتِ قبلی شروع شود</p>
+  <div class="card">
+    <h2>بازیکنان (یا تیم‌ها)</h2>
+    <div class="row" style="gap:8px"><input type="text" id="nameIn" placeholder="اسم بازیکن…" enterkeyhint="done"><button class="icon" id="addBtn" style="width:52px;height:48px;background:var(--accent)">＋</button></div>
+    <div class="names" id="names"></div>
+    <p class="muted" id="needMore" style="margin:8px 0 0;font-size:14px">حداقل ۲ بازیکن اضافه کنید.</p>
+  </div>
+  <div class="card">
+    <h2>زمان هر نوبت</h2>
+    <div class="chips" id="times"></div>
+    <h2 style="margin-top:16px">چند بار باختن تا حذف؟</h2>
+    <div class="chips" id="lives"></div>
+  </div>
+  <button class="btn primary" id="startBtn">شروع مشاعره</button>
+  <button class="btn ghost" onclick="$('#rules').classList.add('on')">قوانین بازی</button>
+</section>
+
+<section class="screen" id="turn">
+  <div class="topbar"><button class="icon" onclick="stopT();$('#exitM').classList.add('on')">✕</button><span class="pill" id="countTag"></span><button class="icon" onclick="openBoard()">🏆</button></div>
+  <div class="plist" id="plist"></div>
+  <div class="center" style="margin-top:4px">
+    <div class="muted">نوبت</div>
+    <div class="big" id="who" style="font-size:34px"></div>
+  </div>
+  <div class="center muted" id="needTxt">بیتی بخوان که با این حرف شروع شود:</div>
+  <div class="letter" id="letter"></div>
+  <div class="timer small" id="clock"></div>
+  <div class="hint" id="hintBox" style="display:none"></div>
+  <div class="grow"></div>
+  <div class="acts">
+    <button class="btn ok" id="okBtn">✓ بیت را گفت</button>
+    <button class="btn bad" id="failBtn">✗ نتوانست</button>
+  </div>
+  <button class="btn ghost" id="hintBtn">💡 یک بیت نمونه نشان بده</button>
+</section>
+
+<section class="screen" id="pickLetter">
+  <h1 style="font-size:24px">حرف آخر بیت چه بود؟</h1>
+  <p class="sub">بیت بعدی باید با این حرف شروع شود</p>
+  <div class="lgrid" id="lgrid"></div>
+  <p class="muted center" style="font-size:13px">برای حرف‌های سخت (مثل ث، ذ، ژ، ض، ظ) می‌توانید حرف هم‌صدا را انتخاب کنید.</p>
+  <div class="grow"></div>
+  <button class="btn ghost" onclick="show('turn');resume()">برگشت</button>
+</section>
+
+<section class="screen" id="end">
+  <div class="emoji center" style="margin-top:20px">🏆</div>
+  <h1 id="winner"></h1>
+  <div class="card"><div class="list" id="finalBoard"></div></div>
+  <div class="grow"></div>
+  <button class="btn primary" id="againBtn">دور جدید</button>
+  <button class="btn ghost" onclick="show('setup')">تنظیمات</button>
+</section>
+
+</div>
+
+<div class="modal" id="boardM" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="card"><h2>🏆 بیت‌های گفته‌شده</h2><div class="list" id="board"></div><div style="height:12px"></div><button class="btn primary" onclick="$('#boardM').classList.remove('on')">بستن</button></div>
+</div>
+<div class="modal" id="exitM" onclick="if(event.target===this){this.classList.remove('on');resume()}">
+  <div class="card">
+    <h2>مشاعره تمام شود؟</h2>
+    <button class="btn bad" onclick="$('#exitM').classList.remove('on');stopT();finish()">بله، اعلام نتیجه</button>
+    <div style="height:10px"></div>
+    <button class="btn ghost" onclick="$('#exitM').classList.remove('on');resume()">ادامه</button>
+  </div>
+</div>
+<div class="modal" id="rules" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="card">
+    <h2>قوانین مشاعره</h2>
+    <p>۱. بازیکنان به نوبت یک بیت شعر می‌خوانند. هر بیت باید با <b>حرف آخرِ بیت قبلی</b> شروع شود.</p>
+    <p>۲. بعد از هر بیت، «بیت را گفت» را بزنید و حرف آخر آن بیت را انتخاب کنید تا نوبت نفر بعد شود.</p>
+    <p>۳. اگر کسی در زمانش نتوانست بیتی بخواند (یا بیت تکراری خواند)، یک بار می‌بازد. وقتی تعداد باخت‌هایش به حد تعیین‌شده رسید، از بازی حذف می‌شود.</p>
+    <p>۴. آخرین نفری که می‌ماند برنده است. دکمه‌ی «بیت نمونه» برای کمک است؛ می‌توانید در جمع قرار بگذارید استفاده از آن مجاز باشد یا نه.</p>
+    <button class="btn primary" onclick="$('#rules').classList.remove('on')">فهمیدم</button>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const fa=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0)}
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let _ac;
+function beep(f=880,d=.15,v=.25){try{_ac=_ac||new(window.AudioContext||window.webkitAudioContext)();if(_ac.state==='suspended')_ac.resume();const o=_ac.createOscillator(),g=_ac.createGain();o.type='sine';o.frequency.value=f;o.connect(g);g.connect(_ac.destination);const t=_ac.currentTime;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+function stepper(el,min,max,val,on){el.innerHTML='<button type="button">+</button><span></span><button type="button">−</button>';const sp=el.querySelector('span');const st={v:val,min,max,set(x){st.v=Math.max(st.min,Math.min(st.max,x));sp.textContent=fa(st.v);on&&on(st.v)}};const [p,m]=el.querySelectorAll('button');p.onclick=()=>st.set(st.v+1);m.onclick=()=>st.set(st.v-1);st.set(val);return st}
+function fmt(s){s=Math.max(0,s);return fa(Math.floor(s/60))+':'+fa(String(s%60).padStart(2,'0'))}
+function namesEditor(input,addBtn,box,key,min){let names=store.get(key,[]);function render(){box.innerHTML='';names.forEach((n,i)=>{const d=document.createElement('div');d.className='name';d.innerHTML='<span></span><button type="button">✕</button>';d.firstChild.textContent=n;d.lastChild.onclick=()=>{names.splice(i,1);save()};box.appendChild(d)});ed.onchange&&ed.onchange(names)}function save(){store.set(key,names);render()}function add(){const v=input.value.trim();if(!v)return;v.split(/[،,\n]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!names.includes(s))names.push(s)});input.value='';save();input.focus()}addBtn.onclick=add;input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});const ed={get names(){return names},render,onchange:null};setTimeout(render);return ed}
+
+const LETTERS='ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی'.split(' ');
+const START='ا ب ت د ر س ش م ن ک گ ی'.split(' ');
+const HINTS={
+'ا':['الا یا ایها الساقی ادر کأسا و ناولها','اگر آن ترک شیرازی به دست آرد دل ما را','ابر و باد و مه و خورشید و فلک در کارند','ای ساربان آهسته رو کآرام جانم می‌رود','آسمان بار امانت نتوانست کشید','این قافله عمر عجب می‌گذرد'],
+'ب':['بشنو از نی چون حکایت می‌کند','بنی‌آدم اعضای یکدیگرند','به نام خداوند جان و خرد','بیا تا گل برافشانیم و می در ساغر اندازیم'],
+'پ':['پیش از اینت بیش از این اندیشه عشاق بود'],
+'ت':['توانا بود هر که دانا بود','تا مرد سخن نگفته باشد'],
+'ج':['جز نقش تو در نظر نیامد ما را'],
+'چ':['چو ایران نباشد تن من مباد','چه خوش بی مهربونی هر دو سر بی'],
+'ح':['حدیث از مطرب و می گو و راز دهر کمتر جو'],
+'خ':['خوشا شیراز و وضع بی‌مثالش'],
+'د':['دلا نزد کسی بنشین که او از دل خبر دارد','دوش دیدم که ملائک در میخانه زدند','دست از طلب ندارم تا کام من برآید'],
+'ر':['رسید مژده که آمد بهار و سبزه دمید'],
+'ز':['زلف آشفته و خوی کرده و خندان لب و مست'],
+'س':['سال‌ها دل طلب جام جم از ما می‌کرد'],
+'ش':['شراب تلخ می‌خواهم که مردافکن بود زورش'],
+'ص':['صبح است ساقیا قدحی پر شراب کن'],
+'ع':['عاشق شو ار نه روزی کار جهان سرآید'],
+'غ':['غلام همت آنم که زیر چرخ کبود'],
+'ف':['فاش می‌گویم و از گفته خود دلشادم'],
+'ک':['کجایید ای شهیدان خدایی','کنون رزم سهراب و رستم شنو'],
+'گ':['گفتم غم تو دارم گفتا غمت سرآید'],
+'م':['من مست و تو دیوانه ما را که برد خانه','مژده ای دل که مسیحا نفسی می‌آید'],
+'ن':['نه هر که چهره برافروخت دلبری داند'],
+'و':['واعظان کاین جلوه در محراب و منبر می‌کنند'],
+'ه':['هر کسی کو دور ماند از اصل خویش'],
+'ی':['یوسف گم‌گشته بازآید به کنعان غم مخور','یاد باد آن که نهانت نظری با ما بود']
+};
+const cfg=store.get('msh',{t:30,l:2});
+let secs=cfg.t,lives=cfg.l;
+function chips(box,items,isOn,onClick){box.innerHTML='';items.forEach(([k,label])=>{const b=document.createElement('button');b.className='chip'+(isOn(k)?' on':'');b.textContent=label;b.onclick=()=>{onClick(k);[...box.children].forEach((c,i)=>c.classList.toggle('on',isOn(items[i][0])))};box.appendChild(b)})}
+chips($('#times'),[[20,'۲۰ ثانیه'],[30,'۳۰ ثانیه'],[45,'۴۵ ثانیه'],[60,'۶۰ ثانیه']],k=>k===secs,k=>secs=k);
+chips($('#lives'),[[1,'۱ بار'],[2,'۲ بار'],[3,'۳ بار']],k=>k===lives,k=>lives=k);
+const ed=namesEditor($('#nameIn'),$('#addBtn'),$('#names'),'mshNames');
+ed.onchange=n=>{$('#needMore').style.display=n.length<2?'block':'none';$('#startBtn').disabled=n.length<2};
+const lg=$('#lgrid');LETTERS.forEach(L=>{const b=document.createElement('button');b.textContent=L;b.onclick=()=>chooseLetter(L);lg.appendChild(b)});
+
+let P=[],cur=0,letter='',left=0,tid=null,total=0;
+function startGame(){
+  store.set('msh',{t:secs,l:lives});
+  P=ed.names.map(n=>({name:n,miss:0,said:0,out:false}));
+  if(P.length<2)return;
+  cur=Math.floor(Math.random()*P.length);letter=pick(START);total=0;
+  showTurn();
+}
+$('#startBtn').onclick=startGame;$('#againBtn').onclick=startGame;
+const alive=()=>P.filter(p=>!p.out);
+function renderList(){const b=$('#plist');b.innerHTML='';P.forEach((p,i)=>{const s=document.createElement('span');s.className='pp'+(i===cur?' cur':'')+(p.out?' out':'');s.textContent=p.name+(p.miss?' '+'✗'.repeat(p.miss):'');b.appendChild(s)})}
+function showTurn(){
+  stopT();
+  $('#who').textContent=P[cur].name;$('#letter').textContent=letter;
+  $('#countTag').textContent='بیت‌ها: '+fa(total);
+  $('#hintBox').style.display='none';$('#hintBtn').style.display='';$('#hintBtn').disabled=!HINTS[letter];
+  renderList();show('turn');
+  left=secs;$('#clock').textContent=fmt(left);$('#clock').style.color='';
+  resume();
+}
+function resume(){stopT();tid=setInterval(()=>{left--;$('#clock').textContent=fmt(left);
+  if(left<=5&&left>0){beep(900,.07);$('#clock').style.color='var(--bad)'}
+  if(left<=0){stopT();beep(300,.7);fail()}},1000)}
+function stopT(){clearInterval(tid);tid=null}
+function next(){let n=cur;do{n=(n+1)%P.length}while(P[n].out);cur=n}
+$('#okBtn').onclick=()=>{stopT();beep(1046,.12);show('pickLetter')};
+function chooseLetter(L){P[cur].said++;total++;letter=L;next();showTurn()}
+function fail(){
+  const p=P[cur];p.miss++;beep(220,.25);
+  if(p.miss>=lives)p.out=true;
+  if(alive().length<=1){finish();return}
+  next();showTurn();
+}
+$('#failBtn').onclick=()=>{stopT();fail()};
+$('#hintBtn').onclick=()=>{const h=HINTS[letter];if(!h)return;const box=$('#hintBox');box.textContent='«'+pick(h)+'»';box.style.display='block';$('#hintBtn').style.display='none'};
+function finish(){
+  stopT();
+  const a=alive();
+  const s=P.slice().sort((x,y)=>(x.out-y.out)||(y.said-x.said));
+  $('#winner').textContent=a.length===1?a[0].name+' برنده شد!':'پایان مشاعره';
+  $('#finalBoard').innerHTML='';s.forEach((p,i)=>{const d=document.createElement('div');d.className='li';d.innerHTML='<span></span><b>'+fa(p.said)+' بیت</b>';d.firstChild.textContent=(i===0&&!p.out?'🥇 ':'')+p.name+(p.out?' (حذف)':'');$('#finalBoard').appendChild(d)});
+  show('end');
+}
+function openBoard(){const b=$('#board');b.innerHTML='';P.slice().sort((x,y)=>y.said-x.said).forEach(p=>{const d=document.createElement('div');d.className='li';d.innerHTML='<span></span><b>'+fa(p.said)+'</b>';d.firstChild.textContent=p.name+(p.out?' (حذف)':'');b.appendChild(d)});$('#boardM').classList.add('on')}
+</script>
+
+<script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body>
+</html>
