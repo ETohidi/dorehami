@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="دورهمی">
+<meta name="theme-color" content="#13111c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>کلمه ممنوعه</title>
+<style>
+@font-face{font-family:"Vazirmatn";src:url("fonts/Vazirmatn.woff2") format("woff2");font-weight:100 900;font-display:swap}
+:root{--bg:#13111c;--card:#1f1c2e;--card2:#2a2640;--line:#3a3555;--text:#f5f2ff;--muted:#a49ec4;--ok:#22c986;--bad:#ff5a6a;--warn:#ffb648}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:"Vazirmatn",Tahoma,sans-serif;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
+body{padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px);background:radial-gradient(120% 60% at 50% -10%,var(--glow),transparent 70%),var(--bg);background-attachment:fixed}
+.wrap{max-width:520px;margin:0 auto;min-height:calc(100vh - 40px);min-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px);display:flex;flex-direction:column}
+.screen{display:none;flex:1;flex-direction:column;gap:14px;animation:fade .25s ease}
+.screen.on{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font-size:30px;margin:6px 0 0;font-weight:900;text-align:center}
+.sub{color:var(--muted);text-align:center;margin:0 0 6px;font-size:15px}
+h2{font-size:17px;margin:0 0 10px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.row+.row{margin-top:14px}
+.lbl{font-size:16px;font-weight:600}
+.lbl small{display:block;color:var(--muted);font-weight:400;font-size:13px}
+.stepper{display:flex;align-items:center;gap:6px;background:var(--card2);border-radius:14px;padding:4px}
+.stepper button{width:40px;height:40px;border:0;border-radius:11px;background:var(--line);color:var(--text);font-size:22px;font-family:inherit;cursor:pointer}
+.stepper button:active{transform:scale(.92)}
+.stepper span{min-width:34px;text-align:center;font-size:19px;font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--card2);color:var(--text);padding:9px 14px;border-radius:999px;font-family:inherit;font-size:15px;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:17px;font-family:inherit;font-size:19px;font-weight:800;color:#fff;background:var(--card2);cursor:pointer;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 24px -8px var(--accent)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--muted);font-weight:600;font-size:16px;padding:13px}
+.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}
+.btn:disabled{opacity:.4}
+.grow{flex:1}
+.center{text-align:center}
+.big{font-size:clamp(30px,8.5vw,42px);font-weight:900;line-height:1.3;text-align:center;margin:0}
+.muted{color:var(--muted)}
+.pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;color:var(--muted)}
+.toggle{position:relative;width:52px;height:30px;flex:none;border-radius:999px;background:var(--line);border:0;cursor:pointer;transition:background .2s}
+.toggle::after{content:"";position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:right .2s}
+.toggle.on{background:var(--accent)}.toggle.on::after{right:25px}
+input[type=text]{width:100%;background:var(--card2);border:1.5px solid var(--line);border-radius:14px;color:var(--text);font-family:inherit;font-size:17px;padding:12px 14px;outline:none;-webkit-user-select:text;user-select:text}
+input[type=text]:focus{border-color:var(--accent)}
+.names{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.name{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 8px 7px 14px;font-size:15px}
+.name button{border:0;background:var(--line);color:var(--text);width:24px;height:24px;border-radius:50%;font-size:14px;cursor:pointer;line-height:1}
+.reveal{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;border-radius:28px;padding:20px 16px;min-height:min(46vh,380px)}
+.cover{background:var(--card);border:2px dashed var(--line)}
+.shown{background:linear-gradient(160deg,var(--accent),var(--accent2))}
+.emoji{font-size:58px;line-height:1}
+.timer{direction:ltr;unicode-bidi:isolate;font-size:84px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.list{display:flex;flex-direction:column;gap:8px}
+.li{display:flex;justify-content:space-between;align-items:center;background:var(--card2);border-radius:14px;padding:11px 14px;font-size:16px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:9;padding:16px}
+.modal.on{display:flex}
+.modal .card{width:100%;max-width:520px;max-height:85vh;overflow:auto;padding-bottom:calc(env(safe-area-inset-bottom) + 16px)}
+.topbar{display:flex;justify-content:space-between;align-items:center}
+.icon{border:0;background:var(--card2);color:var(--text);width:40px;height:40px;border-radius:12px;font-size:18px;cursor:pointer;font-family:inherit}
+p{line-height:1.9}
+
+.home{display:flex;align-items:center;justify-content:center;text-decoration:none}
+
+:root{--accent:#2563eb;--accent2:#db2777;--glow:rgba(37,99,235,.28)}
+.tcard{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--card);border-radius:26px;padding:18px;text-align:center;transition:background .2s}
+.tcard .w{font-size:clamp(34px,10vw,56px);font-weight:900;line-height:1.3}
+.tcard.flashok{background:var(--ok)}.tcard.flashbad{background:var(--bad)}.tcard.flashskip{background:var(--card2)}
+.forb{width:100%;max-width:320px;border-top:1px dashed var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.forb div{background:#ff5a6a22;color:#ffb3bb;border-radius:12px;padding:7px;font-size:20px;font-weight:700}
+.forb small{color:var(--muted);font-size:13px}
+.pad3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px;height:19vh;min-height:96px}
+.pad3 button{border:0;border-radius:20px;font-family:inherit;font-size:20px;font-weight:900;color:#fff;cursor:pointer}
+.pad3 .y{background:var(--ok)}.pad3 .s{background:var(--card2)}.pad3 .n{background:var(--bad)}
+.pad3 button:active{filter:brightness(1.15);transform:scale(.98)}
+.count{font-size:160px;font-weight:900;text-align:center;flex:1;display:flex;align-items:center;justify-content:center;animation:pop 1s infinite}
+@keyframes pop{0%{transform:scale(.6);opacity:.3}30%{transform:scale(1);opacity:1}}
+.mini{direction:ltr;unicode-bidi:isolate;font-size:40px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums}
+.teamIn{display:flex;gap:8px;margin-top:8px}
+.li{cursor:pointer}
+.li .r{font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section class="screen on" id="setup">
+  <div class="topbar"><a class="icon home" href="./" aria-label="خانه">🏠</a><span></span></div>
+  <div class="emoji center" style="margin-top:8px">🤐</div>
+  <h1>کلمه ممنوعه</h1>
+  <p class="sub">کلمه را توضیح بده، ولی کلمه‌های ممنوعه را نگو!</p>
+  <div class="card">
+    <h2>زمان هر دور</h2>
+    <div class="chips" id="times"></div>
+  </div>
+  <div class="card">
+    <div class="row"><div class="lbl">تعداد تیم‌ها</div><div class="stepper" id="sTeams"></div></div>
+    <div id="teamNames"></div>
+  </div>
+  <button class="btn primary" id="startBtn">شروع بازی</button>
+  <button class="btn ghost" onclick="$('#rules').classList.add('on')">قوانین بازی</button>
+</section>
+
+<section class="screen" id="turn">
+  <div class="topbar"><span class="pill" id="roundNo"></span><button class="icon" onclick="$('#exitM').classList.add('on')">✕</button></div>
+  <div class="reveal shown" style="min-height:30vh">
+    <div style="color:#ffffffcc">نوبت</div>
+    <div class="big" id="turnTeam"></div>
+    <p style="margin:0;color:#ffffffdd">یک نفر از این تیم توضیح می‌دهد. یک نفر از تیم حریف کنارش بنشیند و صفحه را ببیند تا اگر کلمه‌ی ممنوعه گفت، «خطا» بزند!</p>
+  </div>
+  <div class="card"><h2>جدول امتیازها</h2><div class="list" id="board"></div></div>
+  <div class="grow"></div>
+  <button class="btn primary" id="goBtn">آماده‌ایم!</button>
+  <button class="btn ghost" id="finishBtn">پایان بازی و اعلام برنده</button>
+</section>
+
+<section class="screen" id="cd"><div class="count" id="cdNum"></div></section>
+
+<section class="screen" id="play">
+  <div class="topbar"><span class="pill" id="liveScore"></span><div class="mini" id="clock"></div></div>
+  <div class="tcard" id="tcard">
+    <div class="w" id="word"></div>
+    <div class="forb" id="forb"></div>
+  </div>
+  <div class="pad3"><button class="y" id="yes">درست ✓</button><button class="s" id="skip">رد ⏭</button><button class="n" id="foul">خطا ⛔</button></div>
+</section>
+
+<section class="screen" id="roundEnd">
+  <h1>وقت تمام شد!</h1>
+  <p class="sub" id="reTitle"></p>
+  <div class="card center"><div class="muted">امتیاز این دور</div><div class="mini" id="reScore"></div><div class="muted" style="font-size:13px">برای اصلاح، روی هر کلمه بزنید: درست ← رد ← خطا</div></div>
+  <div class="list" id="reList"></div>
+  <div class="grow"></div>
+  <button class="btn primary" id="nextTeamBtn">ثبت امتیاز ✓</button>
+</section>
+
+<section class="screen" id="final">
+  <div class="emoji center" style="margin-top:20px">🏆</div>
+  <h1 id="winner"></h1>
+  <div class="card"><div class="list" id="finalBoard"></div></div>
+  <div class="grow"></div>
+  <button class="btn primary" onclick="show('setup')">بازی جدید</button>
+</section>
+
+</div>
+
+<div class="modal" id="rules" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="card">
+    <h2>قوانین کلمه ممنوعه</h2>
+    <p>۱. تیم‌ها به نوبت بازی می‌کنند. یک نفر کلمه‌ی بالای کارت را برای هم‌تیمی‌هایش توضیح می‌دهد.</p>
+    <p>۲. گفتن خود کلمه، بخشی از آن، یا هر کدام از <b>کلمه‌های ممنوعه</b> (قرمزها) خطاست. اشاره و ادا درآوردن هم مجاز نیست!</p>
+    <p>۳. حدس درست: <b>+۱</b> · رد کردن: <b>۰</b> · خطا: <b>−۱</b></p>
+    <p>۴. یک نفر از تیم حریف صفحه را می‌بیند و اگر کلمه‌ی ممنوعه شنید، «خطا» را می‌زند.</p>
+    <button class="btn primary" onclick="$('#rules').classList.remove('on')">فهمیدم</button>
+  </div>
+</div>
+<div class="modal" id="exitM" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="card">
+    <h2>بازی را ترک می‌کنید؟</h2>
+    <p class="muted">امتیازها پاک می‌شوند.</p>
+    <button class="btn bad" onclick="$('#exitM').classList.remove('on');show('setup')">بله، خروج</button>
+    <div style="height:10px"></div>
+    <button class="btn ghost" onclick="$('#exitM').classList.remove('on')">ادامه</button>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const fa=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0)}
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let _ac;
+function beep(f=880,d=.15,v=.25){try{_ac=_ac||new(window.AudioContext||window.webkitAudioContext)();if(_ac.state==='suspended')_ac.resume();const o=_ac.createOscillator(),g=_ac.createGain();o.type='sine';o.frequency.value=f;o.connect(g);g.connect(_ac.destination);const t=_ac.currentTime;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+function stepper(el,min,max,val,on){el.innerHTML='<button type="button">+</button><span></span><button type="button">−</button>';const sp=el.querySelector('span');const st={v:val,min,max,set(x){st.v=Math.max(st.min,Math.min(st.max,x));sp.textContent=fa(st.v);on&&on(st.v)}};const [p,m]=el.querySelectorAll('button');p.onclick=()=>st.set(st.v+1);m.onclick=()=>st.set(st.v-1);st.set(val);return st}
+function fmt(s){s=Math.max(0,s);return fa(Math.floor(s/60))+':'+fa(String(s%60).padStart(2,'0'))}
+function namesEditor(input,addBtn,box,key,min){let names=store.get(key,[]);function render(){box.innerHTML='';names.forEach((n,i)=>{const d=document.createElement('div');d.className='name';d.innerHTML='<span></span><button type="button">✕</button>';d.firstChild.textContent=n;d.lastChild.onclick=()=>{names.splice(i,1);save()};box.appendChild(d)});ed.onchange&&ed.onchange(names)}function save(){store.set(key,names);render()}function add(){const v=input.value.trim();if(!v)return;v.split(/[،,\n]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!names.includes(s))names.push(s)});input.value='';save();input.focus()}addBtn.onclick=add;input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});const ed={get names(){return names},render,onchange:null};setTimeout(render);return ed}
+
+const CARDS=[
+['پیتزا','پنیر','ایتالیا','خمیر','گرد'],['فوتبال','توپ','دروازه','گل','بازیکن'],['دندانپزشک','دندان','دکتر','مسواک','درد'],['نوروز','عید','سال','بهار','هفت‌سین'],
+['یخچال','سرد','آشپزخانه','غذا','برق'],['هواپیما','پرواز','فرودگاه','خلبان','آسمان'],['چای','داغ','قوری','استکان','قند'],['تولد','کیک','شمع','کادو','جشن'],
+['باران','آب','ابر','چتر','خیس'],['موبایل','گوشی','زنگ','پیام','تماس'],['مدرسه','معلم','دانش‌آموز','کلاس','درس'],['ساحل','دریا','شن','آفتاب','شنا'],
+['عینک','چشم','شیشه','دیدن','قاب'],['شیر جنگل','جنگل','سلطان','یال','غرش'],['کتاب','خواندن','صفحه','نویسنده','کتابخانه'],['عروسی','عروس','داماد','جشن','حلقه'],
+['قورمه‌سبزی','خورش','سبزی','لوبیا','برنج'],['دوچرخه','چرخ','رکاب','زین','سواری'],['ساعت','زمان','عقربه','دقیقه','مچ'],['آینه','تصویر','نگاه','شیشه','صورت'],
+['سینما','فیلم','پرده','بلیت','تماشا'],['برف','سفید','سرد','زمستان','آدم‌برفی'],['خواب','تخت','شب','چشم','بیدار'],['کلید','در','قفل','باز کردن','جاکلیدی'],
+['پلیس','دزد','قانون','آژیر','جریمه'],['آشپز','غذا','آشپزخانه','رستوران','پختن'],['اینترنت','وای‌فای','شبکه','سایت','آنلاین'],['هندوانه','قرمز','تابستان','یلدا','دانه'],
+['شب یلدا','انار','هندوانه','حافظ','بلند'],['فرش','زمین','دستباف','ایرانی','پهن'],['سماور','چای','آب','جوش','قوری'],['تاکسی','راننده','ماشین','کرایه','مسافر'],
+['بیمارستان','دکتر','پرستار','مریض','آمبولانس'],['کامپیوتر','لپ‌تاپ','صفحه‌کلید','موس','برنامه'],['ماه','شب','آسمان','کامل','ستاره'],['زنبور','عسل','نیش','کندو','گل'],
+['چتر','باران','باز','خیس','دسته'],['عکس','دوربین','گرفتن','سلفی','آلبوم'],['رستوران','غذا','گارسون','منو','سفارش'],['کادو','هدیه','تولد','کاغذ','جعبه'],
+['مسواک','دندان','خمیر','صبح','شستن'],['فیل','بزرگ','خرطوم','عاج','خاکستری'],['باشگاه ورزشی','ورزش','وزنه','بدنسازی','مربی'],['ماشین','رانندگی','چرخ','بنزین','خیابان'],
+['شنا','آب','استخر','دریا','مایو'],['آتش','داغ','سوختن','شعله','دود'],['تلویزیون','کانال','برنامه','سریال','کنترل'],['کیف','پول','دستی','مدرسه','کوله'],
+['حافظ','شاعر','شیراز','فال','دیوان'],['چهارشنبه‌سوری','آتش','پریدن','ترقه','سال'],['سیزده‌به‌در','نوروز','طبیعت','سبزه','گره'],['کباب','گوشت','سیخ','منقل','کوبیده'],
+['نان','نانوایی','سنگک','لواش','گندم'],['خرید','فروشگاه','پول','بازار','کیسه'],['مادربزرگ','پدربزرگ','مامان','پیر','نوه'],['معلم','مدرسه','درس','کلاس','شاگرد'],
+['گربه','میو','موش','پنجه','خانگی'],['آسانسور','طبقه','ساختمان','بالا','دکمه'],['پیک‌نیک','طبیعت','زیرانداز','غذا','پارک'],['دریا','آب','موج','ساحل','شور'],
+['کوه','بلند','قله','کوهنوردی','دماوند'],['قهوه','کافه','تلخ','فنجان','کافئین'],['پروانه','بال','رنگی','گل','کرم'],['ستاره','آسمان','شب','چشمک','درخشان'],
+['دیکشنری','لغت','معنی','کتاب','زبان'],['آدامس','جویدن','دهان','بادکنک','طعم'],['آمبولانس','بیمارستان','آژیر','اورژانس','مریض'],['کنکور','دانشگاه','امتحان','تست','رتبه'],
+['ترافیک','ماشین','خیابان','شلوغ','چراغ'],['عسل','زنبور','شیرین','کندو','صبحانه'],['تخم‌مرغ','مرغ','صبحانه','زرده','نیمرو'],['دکتر','بیمارستان','مریض','نسخه','دارو'],
+['شطرنج','شاه','وزیر','مهره','صفحه'],['جوجه‌کباب','مرغ','سیخ','زعفران','منقل'],['کفش','پا','بند','پوشیدن','جفت'],['انار','دانه','قرمز','یلدا','آب‌انار'],
+['لباسشویی','لباس','شستن','پودر','ماشین'],['مترو','قطار','ایستگاه','زیرزمین','بلیت'],['کلاغ','سیاه','پرنده','قارقار','درخت'],['بادکنک','باد','جشن','ترکیدن','رنگی']
+];
+const saved=store.get('tb',{t:60,n:2,names:['تیم آبی','تیم قرمز','تیم سبز','تیم زرد']});
+let secs=saved.t,teamNames=saved.names.slice();
+function chips(box,items,isOn,onClick){box.innerHTML='';items.forEach(([k,label])=>{const b=document.createElement('button');b.className='chip'+(isOn(k)?' on':'');b.textContent=label;b.onclick=()=>{onClick(k);[...box.children].forEach((c,i)=>c.classList.toggle('on',isOn(items[i][0])))};box.appendChild(b)})}
+chips($('#times'),[[45,'۴۵ ثانیه'],[60,'۶۰ ثانیه'],[90,'۹۰ ثانیه'],[120,'۲ دقیقه']],k=>k===secs,k=>secs=k);
+const TN=stepper($('#sTeams'),2,4,saved.n,renderTeams);
+function renderTeams(n){const box=$('#teamNames');if(!box)return;box.innerHTML='';for(let i=0;i<n;i++){const d=document.createElement('div');d.className='teamIn';const inp=document.createElement('input');inp.type='text';inp.value=teamNames[i]||('تیم '+fa(i+1));inp.oninput=()=>teamNames[i]=inp.value;d.appendChild(inp);box.appendChild(d)}}
+renderTeams(TN.v);
+
+let used=new Set(store.get('tbUsed',[])),deck=[],G,R,tid;
+function buildDeck(){let fresh=CARDS.filter(c=>!used.has(c[0]));if(fresh.length<10){used.clear();fresh=CARDS;store.set('tbUsed',[])}deck=shuffle(fresh)}
+$('#startBtn').onclick=()=>{
+  store.set('tb',{t:secs,n:TN.v,names:teamNames});
+  buildDeck();
+  G={teams:[...Array(TN.v)].map((_,i)=>({name:(teamNames[i]||'').trim()||'تیم '+fa(i+1),score:0})),cur:0,round:1};
+  showTurn();
+};
+function showTurn(){
+  $('#turnTeam').textContent=G.teams[G.cur].name;$('#roundNo').textContent='دور '+fa(G.round);
+  $('#board').innerHTML='';G.teams.forEach((x,i)=>{const d=document.createElement('div');d.className='li';d.innerHTML='<span></span><b>'+fa(x.score)+'</b>';d.firstChild.textContent=(i===G.cur?'👉 ':'')+x.name;$('#board').appendChild(d)});
+  show('turn');
+}
+$('#finishBtn').onclick=()=>{
+  const s=G.teams.slice().sort((a,b)=>b.score-a.score);
+  $('#winner').textContent=s[0].score===s[1].score?'مساوی شد!':s[0].name+' برنده شد!';
+  $('#finalBoard').innerHTML='';s.forEach((x,i)=>{const d=document.createElement('div');d.className='li';d.innerHTML='<span></span><b>'+fa(x.score)+'</b>';d.firstChild.textContent=(['🥇','🥈','🥉','🏅'][i]||'')+' '+x.name;$('#finalBoard').appendChild(d)});
+  show('final');
+};
+$('#goBtn').onclick=()=>{
+  show('cd');let c=3;$('#cdNum').textContent=fa(c);beep(520,.15);
+  const iv=setInterval(()=>{c--;if(c>0){$('#cdNum').textContent=fa(c);beep(520,.15)}else{clearInterval(iv);beep(880,.3);startRound()}},1000);
+};
+function nextCard(){
+  if(!deck.length)buildDeck();
+  R.cur=deck.pop();used.add(R.cur[0]);store.set('tbUsed',[...used]);
+  $('#word').textContent=R.cur[0];
+  $('#forb').innerHTML='<small>این کلمه‌ها را نگو:</small>';R.cur.slice(1).forEach(f=>{const d=document.createElement('div');d.textContent=f;$('#forb').appendChild(d)});
+}
+const PTS={ok:1,skip:0,foul:-1};
+const score=()=>R.items.reduce((a,x)=>a+PTS[x.r],0);
+function startRound(){
+  R={left:secs,items:[],locked:false};
+  $('#clock').textContent=fmt(R.left);$('#clock').style.color='';$('#liveScore').textContent='امتیاز: '+fa(0);
+  nextCard();show('play');
+  tid=setInterval(()=>{R.left--;$('#clock').textContent=fmt(R.left);
+    if(R.left<=5&&R.left>0){beep(900,.07);$('#clock').style.color='var(--bad)'}
+    if(R.left<=0){clearInterval(tid);beep(300,.7);endRound()}},1000);
+}
+function answer(r){
+  if(R.locked||R.left<=0)return;R.locked=true;
+  R.items.push({w:R.cur[0],r});
+  beep(r==='ok'?1046:r==='foul'?180:440,.2);
+  const box=$('#tcard');const cls={ok:'flashok',skip:'flashskip',foul:'flashbad'}[r];box.classList.add(cls);
+  const sc=score();$('#liveScore').textContent='امتیاز: '+(sc<0?'−'+fa(-sc):fa(sc));
+  setTimeout(()=>{box.classList.remove(cls);if(R.left>0)nextCard();R.locked=false},350);
+}
+$('#yes').onclick=()=>answer('ok');$('#skip').onclick=()=>answer('skip');$('#foul').onclick=()=>answer('foul');
+const LBL={ok:['✓','var(--ok)'],skip:['رد','var(--muted)'],foul:['⛔ −۱','var(--bad)']};
+function endRound(){$('#reTitle').textContent=G.teams[G.cur].name;renderRE();show('roundEnd')}
+function renderRE(){
+  const box=$('#reList');box.innerHTML='';
+  R.items.forEach(it=>{const d=document.createElement('div');d.className='li';d.innerHTML='<span></span><span class="r"></span>';d.firstChild.textContent=it.w;d.lastChild.textContent=LBL[it.r][0];d.lastChild.style.color=LBL[it.r][1];d.onclick=()=>{it.r={ok:'skip',skip:'foul',foul:'ok'}[it.r];renderRE()};box.appendChild(d)});
+  if(!R.items.length)box.innerHTML='<p class="center muted">هیچ کارتی بازی نشد!</p>';
+  const sc=score();$('#reScore').textContent=sc<0?'−'+fa(-sc):fa(sc);
+}
+$('#nextTeamBtn').onclick=()=>{G.teams[G.cur].score+=score();G.cur=(G.cur+1)%G.teams.length;if(G.cur===0)G.round++;showTurn()};
+</script>
+
+<script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body>
+</html>
