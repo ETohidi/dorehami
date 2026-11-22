@@ -85,7 +85,13 @@ p{line-height:1.9}
   <h1>جاسوس</h1>
   <p class="sub">همه یک کلمه را می‌دانند، جز جاسوس!</p>
   <div class="card">
-    <div class="row"><div class="lbl">تعداد بازیکنان</div><div class="stepper" id="sPlayers"></div></div>
+    <h2>اسم بازیکنان <span class="muted" style="font-size:13px;font-weight:400">(اختیاری)</span></h2>
+    <div class="row" style="gap:8px"><input type="text" id="nameIn" placeholder="اسم بازیکن…" enterkeyhint="done"><button class="icon" id="addBtn" style="width:52px;height:48px;background:var(--accent)">＋</button></div>
+    <div class="names" id="names"></div>
+    <p class="muted" id="nameNote" style="margin:8px 0 0;font-size:13px">اگر اسم‌ها را به ترتیب نشستن وارد کنید، گوشی به همان ترتیب دست‌به‌دست می‌شود.</p>
+  </div>
+  <div class="card">
+    <div class="row" id="countRow"><div class="lbl">تعداد بازیکنان</div><div class="stepper" id="sPlayers"></div></div>
     <div class="row"><div class="lbl">تعداد جاسوس‌ها</div><div class="stepper" id="sSpies"></div></div>
     <div class="row"><div class="lbl">زمان گفتگو<small>به دقیقه</small></div><div class="stepper" id="sTime"></div></div>
     <div class="row"><div class="lbl">راهنما برای جاسوس<small>جاسوس دسته‌بندی را می‌بیند</small></div><button class="toggle" id="hint"></button></div>
@@ -176,7 +182,7 @@ let _ac;
 function beep(f=880,d=.15,v=.25){try{_ac=_ac||new(window.AudioContext||window.webkitAudioContext)();if(_ac.state==='suspended')_ac.resume();const o=_ac.createOscillator(),g=_ac.createGain();o.type='sine';o.frequency.value=f;o.connect(g);g.connect(_ac.destination);const t=_ac.currentTime;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
 function stepper(el,min,max,val,on){el.innerHTML='<button type="button">+</button><span></span><button type="button">−</button>';const sp=el.querySelector('span');const st={v:val,min,max,set(x){st.v=Math.max(st.min,Math.min(st.max,x));sp.textContent=fa(st.v);on&&on(st.v)}};const [p,m]=el.querySelectorAll('button');p.onclick=()=>st.set(st.v+1);m.onclick=()=>st.set(st.v-1);st.set(val);return st}
 function fmt(s){s=Math.max(0,s);return fa(Math.floor(s/60))+':'+fa(String(s%60).padStart(2,'0'))}
-function namesEditor(input,addBtn,box,key,min){let names=store.get(key,[]);function render(){box.innerHTML='';names.forEach((n,i)=>{const d=document.createElement('div');d.className='name';d.innerHTML='<span></span><button type="button">✕</button>';d.firstChild.textContent=n;d.lastChild.onclick=()=>{names.splice(i,1);save()};box.appendChild(d)});ed.onchange&&ed.onchange(names)}function save(){store.set(key,names);render()}function add(){const v=input.value.trim();if(!v)return;v.split(/[،,\n]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!names.includes(s))names.push(s)});input.value='';save();input.focus()}addBtn.onclick=add;input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});const ed={get names(){return names},render,onchange:null};setTimeout(render);return ed}
+function namesEditor(input,addBtn,box,key,min){let names=store.get('players',null)||store.get(key,[]);function render(){box.innerHTML='';names.forEach((n,i)=>{const d=document.createElement('div');d.className='name';d.innerHTML='<span></span><button type="button">✕</button>';d.firstChild.textContent=n;d.lastChild.onclick=()=>{names.splice(i,1);save()};box.appendChild(d)});ed.onchange&&ed.onchange(names)}function save(){store.set('players',names);render()}function add(){const v=input.value.trim();if(!v)return;v.split(/[،,\n]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!names.includes(s))names.push(s)});input.value='';save();input.focus()}addBtn.onclick=add;input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});const ed={get names(){return names},render,onchange:null};setTimeout(render);return ed}
 
 const WORDS={
 places:{t:'مکان‌ها',e:'📍',w:['فرودگاه','بیمارستان','مدرسه','سینما','ساحل','کتابخانه','رستوران','باشگاه ورزشی','آرایشگاه','بانک','ایستگاه مترو','باغ‌وحش','استخر','کلانتری','نانوایی','جشن عروسی','کشتی تفریحی','کوه','پارک','موزه','هتل','داروخانه','بازار','شهربازی','پمپ بنزین','ایستگاه آتش‌نشانی','دانشگاه','قطار','سفارت','کافه','کمپ جنگلی','زیردریایی','ایستگاه فضایی','سیرک','سوپرمارکت','دندانپزشکی']},
@@ -199,6 +205,10 @@ const saved=store.get('spy',{p:5,s:1,t:5,h:false,c:['places','foods','animals','
 const P=stepper($('#sPlayers'),3,20,saved.p,v=>{if(window.S){S.max=Math.max(1,Math.floor((v-1)/2));S.set(S.v)}});
 const S=stepper($('#sSpies'),1,3,saved.s);window.S=S;S.max=Math.max(1,Math.floor((P.v-1)/2));S.set(S.v);
 const T=stepper($('#sTime'),1,15,saved.t);
+const ed=namesEditor($('#nameIn'),$('#addBtn'),$('#names'),'spyNames');
+const useNames=()=>ed.names.length>=3;
+ed.onchange=n=>{const on=n.length>=3;$('#countRow').style.display=on?'none':'';if(on)P.set(Math.min(20,n.length));$('#nameNote').textContent=on?'تعداد بازیکنان: '+fa(Math.min(20,n.length))+' نفر — به ترتیب همین اسم‌ها':(n.length?'حداقل ۳ اسم لازم است؛ وگرنه بازیکنان شماره‌دار می‌شوند.':'اگر اسم‌ها را به ترتیب نشستن وارد کنید، گوشی به همان ترتیب دست‌به‌دست می‌شود.')};
+const pname=i=>G.names?G.names[i]:'بازیکن '+fa(i+1);
 let hint=saved.h;const hb=$('#hint');hb.classList.toggle('on',hint);hb.onclick=()=>{hint=!hint;hb.classList.toggle('on',hint)};
 let cats=new Set(saved.c);
 const catBox=$('#cats');
@@ -212,12 +222,12 @@ function newRound(){
   let fresh=pool.filter(x=>!used.includes(x[1]));if(!fresh.length){used=[];fresh=pool}
   const [cat,word]=pick(fresh);used.push(word);store.set('spyUsed',used.slice(-150));
   const spies=shuffle([...Array(P.v).keys()]).slice(0,S.v);
-  G={n:P.v,cat,word,spies,i:0,secs:T.v*60,left:T.v*60};
+  G={n:P.v,cat,word,spies,i:0,secs:T.v*60,left:T.v*60,names:useNames()?ed.names.slice(0,20):null};
   nextPass();
 }
 function nextPass(){
   if(G.i>=G.n){startPlay();return}
-  $('#passName').textContent='بازیکن '+fa(G.i+1);
+  $('#passName').textContent=pname(G.i);
   $('#passCount').textContent=fa(G.i+1)+' از '+fa(G.n);
   show('pass');
 }
@@ -228,12 +238,12 @@ $('#seeBtn').onclick=()=>{
    ?'<div class="emoji">🕵️</div><div class="big">تو جاسوسی!</div><p style="margin:0;color:#ffffffcc">کلمه را نمی‌دانی. از حرف‌های بقیه حدسش بزن و لو نرو.</p>'+(hint?'<div class="pill" style="background:#ffffff1a;color:#fff;border:0">دسته‌بندی: '+WORDS[G.cat].t+'</div>':'')
    :'<div class="emoji">'+WORDS[G.cat].e+'</div><div style="color:#ffffffcc">کلمه‌ی تو:</div><div class="big"></div><div class="pill" style="background:#0003;color:#fff;border:0">'+WORDS[G.cat].t+'</div>';
   if(!isSpy)box.querySelector('.big').textContent=G.word;
-  $('#cardCount').textContent='بازیکن '+fa(G.i+1);
+  $('#cardCount').textContent=pname(G.i);
   show('card');
 };
 $('#hideBtn').onclick=()=>{G.i++;nextPass()};
 let tid=null;
-function startPlay(){$('#starter').textContent='بازیکن '+fa(1+Math.floor(Math.random()*G.n));G.left=G.secs;$('#clock').textContent=fmt(G.left);$('#clock').style.color='';$('#timerBtn').textContent='شروع زمان';show('play')}
+function startPlay(){$('#starter').textContent=pname(Math.floor(Math.random()*G.n));G.left=G.secs;$('#clock').textContent=fmt(G.left);$('#clock').style.color='';$('#timerBtn').textContent='شروع زمان';show('play')}
 function stopTimer(){clearInterval(tid);tid=null}
 $('#timerBtn').onclick=()=>{
   if(tid){stopTimer();$('#timerBtn').textContent='ادامه';return}
@@ -244,7 +254,7 @@ $('#timerBtn').onclick=()=>{
     if(G.left<=0){stopTimer();beep(440,.6);setTimeout(()=>beep(330,.8),300);$('#timerBtn').textContent='زمان تمام شد!';}
   },1000);
 };
-$('#endBtn').onclick=()=>{stopTimer();$('#resWord').textContent=G.word;$('#resCat').textContent=WORDS[G.cat].e+' '+WORDS[G.cat].t;$('#resSpies').textContent=G.spies.sort((a,b)=>a-b).map(i=>'بازیکن '+fa(i+1)).join(' و ');show('result')};
+$('#endBtn').onclick=()=>{stopTimer();$('#resWord').textContent=G.word;$('#resCat').textContent=WORDS[G.cat].e+' '+WORDS[G.cat].t;$('#resSpies').textContent=G.spies.sort((a,b)=>a-b).map(i=>pname(i)).join(' و ');show('result')};
 $('#startBtn').onclick=newRound;$('#againBtn').onclick=newRound;
 function confirmExit(){$('#exitM').classList.add('on')}
 </script>
