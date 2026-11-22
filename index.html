@@ -70,15 +70,48 @@ input[type=text]:focus{border-color:var(--accent)}
 .icon{border:0;background:var(--card2);color:var(--text);width:40px;height:40px;border-radius:12px;font-size:18px;cursor:pointer;font-family:inherit}
 p{line-height:1.9}
 
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{overflow-x:clip;overscroll-behavior-y:none}
+.big,h1,.prompt,.w{overflow-wrap:anywhere}
+h1{font-size:clamp(23px,7vw,30px)}
+.emoji{font-size:clamp(42px,13vw,58px)}
+.btn{font-size:clamp(16px,4.7vw,19px);padding:clamp(12px,3.6vw,17px)}
+.btn.small{font-size:14px;padding:10px;font-weight:600}
+.card{padding:clamp(12px,3.6vw,16px)}
+.timer{font-size:clamp(54px,19vw,84px)}
+.lbl{font-size:clamp(14px,4.2vw,16px)}
+.modal .card{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.sheetBtns{display:flex;flex-direction:column;gap:10px}
+.gmb{font-size:20px;flex:none}
+.topbar{gap:8px;min-height:40px}
+.rctl{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;margin-top:10px;font-size:12.5px}
+.rbtns{display:flex;gap:6px}
+.mini-btn{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:999px;padding:5px 11px;font-family:inherit;font-size:13px;cursor:pointer}
+.name{padding:0;gap:0;overflow:hidden}
+.name .nt{display:flex;align-items:center;gap:6px;border:0;background:transparent;color:inherit;font-family:inherit;font-size:15px;padding:7px 12px 7px 6px;cursor:pointer;width:auto;height:auto;border-radius:0}
+.name .ck{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);font-size:12px}
+.name.on{border-color:var(--accent)}.name.on .ck{background:var(--accent);border-color:var(--accent);color:#fff}
+.name.off{opacity:.5}.name.off .nm{text-decoration:line-through}
+.name .ne{border:0;border-right:1px solid var(--line);background:transparent;color:var(--muted);width:auto;height:auto;border-radius:0;padding:7px 10px;font-size:14px;cursor:pointer}
+@media (max-height:700px){.screen{gap:10px}.reveal{padding:16px 14px;gap:8px}.emoji{font-size:44px}h1{font-size:23px;margin-top:0}.sub{font-size:14px}.btn{padding:12px}}
+@media (max-height:600px){.emoji{font-size:36px}.big{font-size:clamp(26px,8vw,34px)}.timer{font-size:52px}.reveal{min-height:0!important}}
+@media (max-width:340px){.stepper button{width:34px;height:34px}.chip{padding:7px 11px;font-size:14px}}
+
+.actbar{position:sticky;bottom:0;z-index:3;display:flex;flex-direction:column;gap:10px;padding-top:12px;background:linear-gradient(to top,var(--bg) 78%,rgba(19,17,28,0))}
+@media (max-height:640px){.reveal p{font-size:13.5px;line-height:1.7}.card{padding:10px 12px}.li{padding:8px 12px}.screen{gap:8px}.topbar{min-height:36px}.icon{width:36px;height:36px}}
+@media (max-height:600px){.pad{min-height:104px!important;height:24vh!important}.pad3{min-height:84px!important}.tcard{padding:10px!important;gap:6px!important}.forb div{padding:4px!important;font-size:17px!important}.prompt{font-size:22px}}
+
 .home{display:flex;align-items:center;justify-content:center;text-decoration:none}
 
 :root{--accent:#a855f7;--accent2:#ec4899;--glow:rgba(168,85,247,.3)}
-.games{display:grid;gap:14px;margin-top:6px}
-.g{display:flex;align-items:center;gap:16px;padding:18px;border-radius:24px;color:#fff;text-decoration:none;box-shadow:0 10px 30px -14px #000;transition:transform .1s}
+.games{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.g{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:clamp(11px,3.4vw,15px);border-radius:20px;color:#fff;text-decoration:none;box-shadow:0 10px 30px -14px #000;transition:transform .1s;min-width:0}
+.g:last-child:nth-child(odd){grid-column:1/-1;flex-direction:row;align-items:center}
 .g:active{transform:scale(.97)}
-.g .e{font-size:46px;width:66px;height:66px;display:flex;align-items:center;justify-content:center;background:#ffffff22;border-radius:18px;flex:none}
-.g b{display:block;font-size:22px;font-weight:900}
-.g small{display:block;font-size:14px;opacity:.88;line-height:1.7;margin-top:2px}
+.g .e{font-size:clamp(24px,7.5vw,32px);width:clamp(40px,12vw,52px);height:clamp(40px,12vw,52px);display:flex;align-items:center;justify-content:center;background:#ffffff22;border-radius:14px;flex:none}
+.g b{display:block;font-size:clamp(16px,4.8vw,19px);font-weight:900}
+.g small{display:block;font-size:clamp(11.5px,3.3vw,13px);opacity:.88;line-height:1.6;margin-top:2px}
+@media (max-height:700px){.g small{display:none}.hubhead .sub{display:none}}
 .spy{background:linear-gradient(135deg,#ff4d6d,#8b5cf6)}
 .hu{background:linear-gradient(135deg,#ff8a1f,#ff3d7f)}
 .td{background:linear-gradient(135deg,#14b8a6,#6366f1)}
@@ -93,9 +126,9 @@ p{line-height:1.9}
 <body>
 <div class="wrap">
 <section class="screen on">
-  <div class="emoji center" style="margin-top:14px">🎲</div>
+  <div class="hubhead"><div class="emoji center" style="margin-top:6px">🎲</div>
   <h1>بازی‌های دورهمی</h1>
-  <p class="sub">یک گوشی، کلی خنده! بازی را انتخاب کنید</p>
+  <p class="sub">یک گوشی، کلی خنده! بازی را انتخاب کنید</p></div>
   <div class="games">
     <a class="g spy" href="spy.html"><span class="e">🕵️</span><span><b>جاسوس</b><small>همه کلمه را می‌دانند جز جاسوس. پیدایش کنید!</small></span></a>
     <a class="g hu" href="headsup.html"><span class="e">🤔</span><span><b>حدس بزن</b><small>توضیح بده یا ادا دربیاور؛ مسابقه‌ی تیمی</small></span></a>
