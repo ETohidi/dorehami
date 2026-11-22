@@ -1,5 +1,5 @@
 // بازی‌های دورهمی — offline cache
-const CACHE='dorehami-11f5f4c862-2';
+const CACHE='dorehami-db6a14ac82-2';
 const ASSETS=['./', 'esmfamil.html', 'fonts/Vazirmatn.woff2', 'headsup.html', 'icons/apple-touch-icon.png', 'icons/icon-192.png', 'icons/icon-512.png', 'index.html', 'mafia.html', 'manifest.webmanifest', 'moshaere.html', 'spy.html', 'taboo.html', 'truth.html'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS.map(u=>new Request(u,{cache:'reload'})))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
