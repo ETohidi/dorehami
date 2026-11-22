@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="دورهمی">
+<meta name="theme-color" content="#13111c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>اسم فامیل</title>
+<style>
+@font-face{font-family:"Vazirmatn";src:url("fonts/Vazirmatn.woff2") format("woff2");font-weight:100 900;font-display:swap}
+:root{--bg:#13111c;--card:#1f1c2e;--card2:#2a2640;--line:#3a3555;--text:#f5f2ff;--muted:#a49ec4;--ok:#22c986;--bad:#ff5a6a;--warn:#ffb648}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:"Vazirmatn",Tahoma,sans-serif;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
+body{padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 16px);background:radial-gradient(120% 60% at 50% -10%,var(--glow),transparent 70%),var(--bg);background-attachment:fixed}
+.wrap{max-width:520px;margin:0 auto;min-height:calc(100vh - 40px);min-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px);display:flex;flex-direction:column}
+.screen{display:none;flex:1;flex-direction:column;gap:14px;animation:fade .25s ease}
+.screen.on{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font-size:30px;margin:6px 0 0;font-weight:900;text-align:center}
+.sub{color:var(--muted);text-align:center;margin:0 0 6px;font-size:15px}
+h2{font-size:17px;margin:0 0 10px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.row+.row{margin-top:14px}
+.lbl{font-size:16px;font-weight:600}
+.lbl small{display:block;color:var(--muted);font-weight:400;font-size:13px}
+.stepper{display:flex;align-items:center;gap:6px;background:var(--card2);border-radius:14px;padding:4px}
+.stepper button{width:40px;height:40px;border:0;border-radius:11px;background:var(--line);color:var(--text);font-size:22px;font-family:inherit;cursor:pointer}
+.stepper button:active{transform:scale(.92)}
+.stepper span{min-width:34px;text-align:center;font-size:19px;font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--card2);color:var(--text);padding:9px 14px;border-radius:999px;font-family:inherit;font-size:15px;cursor:pointer}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.btn{display:block;width:100%;border:0;border-radius:18px;padding:17px;font-family:inherit;font-size:19px;font-weight:800;color:#fff;background:var(--card2);cursor:pointer;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 24px -8px var(--accent)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--muted);font-weight:600;font-size:16px;padding:13px}
+.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}
+.btn:disabled{opacity:.4}
+.grow{flex:1}
+.center{text-align:center}
+.big{font-size:clamp(30px,8.5vw,42px);font-weight:900;line-height:1.3;text-align:center;margin:0}
+.muted{color:var(--muted)}
+.pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;color:var(--muted)}
+.toggle{position:relative;width:52px;height:30px;flex:none;border-radius:999px;background:var(--line);border:0;cursor:pointer;transition:background .2s}
+.toggle::after{content:"";position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:right .2s}
+.toggle.on{background:var(--accent)}.toggle.on::after{right:25px}
+input[type=text]{width:100%;background:var(--card2);border:1.5px solid var(--line);border-radius:14px;color:var(--text);font-family:inherit;font-size:17px;padding:12px 14px;outline:none;-webkit-user-select:text;user-select:text}
+input[type=text]:focus{border-color:var(--accent)}
+.names{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.name{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 8px 7px 14px;font-size:15px}
+.name button{border:0;background:var(--line);color:var(--text);width:24px;height:24px;border-radius:50%;font-size:14px;cursor:pointer;line-height:1}
+.reveal{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;border-radius:28px;padding:20px 16px;min-height:min(46vh,380px)}
+.cover{background:var(--card);border:2px dashed var(--line)}
+.shown{background:linear-gradient(160deg,var(--accent),var(--accent2))}
+.emoji{font-size:58px;line-height:1}
+.timer{direction:ltr;unicode-bidi:isolate;font-size:84px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:2px}
+.list{display:flex;flex-direction:column;gap:8px}
+.li{display:flex;justify-content:space-between;align-items:center;background:var(--card2);border-radius:14px;padding:11px 14px;font-size:16px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:9;padding:16px}
+.modal.on{display:flex}
+.modal .card{width:100%;max-width:520px;max-height:85vh;overflow:auto;padding-bottom:calc(env(safe-area-inset-bottom) + 16px)}
+.topbar{display:flex;justify-content:space-between;align-items:center}
+.icon{border:0;background:var(--card2);color:var(--text);width:40px;height:40px;border-radius:12px;font-size:18px;cursor:pointer;font-family:inherit}
+p{line-height:1.9}
+
+.home{display:flex;align-items:center;justify-content:center;text-decoration:none}
+
+:root{--accent:#16a34a;--accent2:#0891b2;--glow:rgba(22,163,74,.26)}
+.letter{width:150px;height:150px;border-radius:36px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:96px;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 12px 34px -12px var(--accent)}
+.letter.spin{animation:wob .12s infinite}
+@keyframes wob{50%{transform:scale(.94) rotate(-3deg)}}
+.catlist{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.catlist span{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:15px}
+.prow{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--card2);border-radius:14px;padding:8px 10px}
+.prow .nm{font-size:16px;font-weight:700}
+.prow .nm small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.qs{display:flex;gap:4px}
+.qs button{direction:ltr;unicode-bidi:isolate;border:0;border-radius:10px;background:var(--line);color:var(--text);font-family:inherit;font-size:15px;font-weight:800;padding:8px 9px;cursor:pointer}
+.qs b{min-width:44px;text-align:center;font-size:19px;align-self:center}
+.timer.small{font-size:64px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section class="screen on" id="setup">
+  <div class="topbar"><a class="icon home" href="./" aria-label="خانه">🏠</a><span></span></div>
+  <div class="emoji center" style="margin-top:8px">📝</div>
+  <h1>اسم فامیل</h1>
+  <p class="sub">کاغذ و خودکار بردارید! حرف را برنامه انتخاب می‌کند</p>
+  <div class="card">
+    <h2>بازیکنان</h2>
+    <div class="row" style="gap:8px"><input type="text" id="nameIn" placeholder="اسم بازیکن…" enterkeyhint="done"><button class="icon" id="addBtn" style="width:52px;height:48px;background:var(--accent)">＋</button></div>
+    <div class="names" id="names"></div>
+    <p class="muted" id="needMore" style="margin:8px 0 0;font-size:14px">حداقل ۲ بازیکن اضافه کنید.</p>
+  </div>
+  <div class="card">
+    <h2>ستون‌ها</h2>
+    <div class="chips" id="cats"></div>
+  </div>
+  <div class="card">
+    <h2>زمان هر دور</h2>
+    <div class="chips" id="times"></div>
+    <div class="row" style="margin-top:14px"><div class="lbl">حرف‌های سخت هم بیاید<small>ث، ذ، ژ، ص، ض، ط، ظ، ع، غ</small></div><button class="toggle" id="hardT"></button></div>
+  </div>
+  <button class="btn primary" id="startBtn">شروع بازی</button>
+  <button class="btn ghost" onclick="$('#rules').classList.add('on')">قوانین و امتیازدهی</button>
+</section>
+
+<section class="screen" id="pick">
+  <div class="topbar"><span class="pill" id="roundTag"></span><button class="icon" onclick="$('#exitM').classList.add('on')">✕</button></div>
+  <div class="center muted" style="margin-top:20px">حرف این دور</div>
+  <div class="letter" id="letter">؟</div>
+  <div class="catlist" id="catlist"></div>
+  <div class="grow"></div>
+  <button class="btn" id="spinBtn">🎲 انتخاب حرف</button>
+  <button class="btn primary" id="goBtn" disabled>شروع زمان ⏱</button>
+</section>
+
+<section class="screen" id="run">
+  <div class="topbar"><span class="pill" id="roundTag2"></span><span></span></div>
+  <div class="letter" id="letter2" style="margin-top:10px"></div>
+  <div class="timer small" id="clock"></div>
+  <div class="catlist" id="catlist2"></div>
+  <div class="grow"></div>
+  <button class="btn bad" id="stopBtn">✋ استپ!</button>
+</section>
+
+<section class="screen" id="score">
+  <h1 style="font-size:24px">امتیاز این دور</h1>
+  <p class="sub">جواب تنها ۱۰ · جواب تکراری ۵ · خالی یا غلط ۰</p>
+  <div class="list" id="scoreList"></div>
+  <div class="grow"></div>
+  <button class="btn primary" id="saveBtn">ثبت امتیاز و دور بعد</button>
+  <button class="btn ghost" id="endBtn">ثبت و پایان بازی</button>
+</section>
+
+<section class="screen" id="final">
+  <div class="emoji center" style="margin-top:20px">🏆</div>
+  <h1 id="winner"></h1>
+  <div class="card"><div class="list" id="finalBoard"></div></div>
+  <div class="grow"></div>
+  <button class="btn primary" onclick="show('setup')">بازی جدید</button>
+</section>
+
+</div>
+
+<div class="modal" id="rules" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="card">
+    <h2>قوانین اسم فامیل</h2>
+    <p>۱. هر کس روی کاغذ ستون‌ها را می‌کشد (اسم، فامیل، شهر…). برنامه یک حرف انتخاب می‌کند.</p>
+    <p>۲. با شروع زمان، همه برای هر ستون کلمه‌ای می‌نویسند که با آن حرف شروع شود. هر کس زودتر همه را پر کرد می‌تواند «استپ!» بگوید و دور تمام می‌شود.</p>
+    <p>۳. امتیاز هر ستون: جوابی که فقط یک نفر نوشته <b>۱۰</b>، جوابی که چند نفر نوشته‌اند <b>۵</b>، خالی یا غلط <b>۰</b>. جمع امتیاز هر نفر را در برنامه وارد کنید.</p>
+    <button class="btn primary" onclick="$('#rules').classList.remove('on')">فهمیدم</button>
+  </div>
+</div>
+<div class="modal" id="exitM" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="card">
+    <h2>بازی تمام شود؟</h2>
+    <button class="btn bad" onclick="$('#exitM').classList.remove('on');clearInterval(tid);finish()">بله، اعلام نتیجه</button>
+    <div style="height:10px"></div>
+    <button class="btn ghost" onclick="$('#exitM').classList.remove('on')">ادامه</button>
+  </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const fa=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0)}
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let _ac;
+function beep(f=880,d=.15,v=.25){try{_ac=_ac||new(window.AudioContext||window.webkitAudioContext)();if(_ac.state==='suspended')_ac.resume();const o=_ac.createOscillator(),g=_ac.createGain();o.type='sine';o.frequency.value=f;o.connect(g);g.connect(_ac.destination);const t=_ac.currentTime;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
+function stepper(el,min,max,val,on){el.innerHTML='<button type="button">+</button><span></span><button type="button">−</button>';const sp=el.querySelector('span');const st={v:val,min,max,set(x){st.v=Math.max(st.min,Math.min(st.max,x));sp.textContent=fa(st.v);on&&on(st.v)}};const [p,m]=el.querySelectorAll('button');p.onclick=()=>st.set(st.v+1);m.onclick=()=>st.set(st.v-1);st.set(val);return st}
+function fmt(s){s=Math.max(0,s);return fa(Math.floor(s/60))+':'+fa(String(s%60).padStart(2,'0'))}
+function namesEditor(input,addBtn,box,key,min){let names=store.get(key,[]);function render(){box.innerHTML='';names.forEach((n,i)=>{const d=document.createElement('div');d.className='name';d.innerHTML='<span></span><button type="button">✕</button>';d.firstChild.textContent=n;d.lastChild.onclick=()=>{names.splice(i,1);save()};box.appendChild(d)});ed.onchange&&ed.onchange(names)}function save(){store.set(key,names);render()}function add(){const v=input.value.trim();if(!v)return;v.split(/[،,\n]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!names.includes(s))names.push(s)});input.value='';save();input.focus()}addBtn.onclick=add;input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});const ed={get names(){return names},render,onchange:null};setTimeout(render);return ed}
+
+const CATS=['اسم','فامیل','شهر','کشور','غذا','میوه','حیوان','رنگ','اشیا','شغل','گل','ماشین','اعضای بدن','پوشاک','فیلم و سریال','ورزش'];
+const EASY='ا ب پ ت ج چ ح خ د ر ز س ش ف ق ک گ ل م ن و ه ی'.split(' ');
+const HARD='ث ذ ژ ص ض ط ظ ع غ'.split(' ');
+const saved=store.get('ef',{c:['اسم','فامیل','شهر','کشور','غذا','میوه','حیوان','رنگ','اشیا'],t:120,h:false});
+let cats=new Set(saved.c),secs=saved.t,hard=saved.h;
+function chips(box,items,isOn,onClick){box.innerHTML='';items.forEach(([k,label])=>{const b=document.createElement('button');b.className='chip'+(isOn(k)?' on':'');b.textContent=label;b.onclick=()=>{onClick(k);[...box.children].forEach((c,i)=>c.classList.toggle('on',isOn(items[i][0])))};box.appendChild(b)})}
+chips($('#cats'),CATS.map(c=>[c,c]),k=>cats.has(k),k=>cats.has(k)?cats.delete(k):cats.add(k));
+chips($('#times'),[[60,'۱ دقیقه'],[90,'۱:۳۰'],[120,'۲ دقیقه'],[180,'۳ دقیقه'],[0,'بدون زمان']],k=>k===secs,k=>secs=k);
+$('#hardT').classList.toggle('on',hard);$('#hardT').onclick=()=>{hard=!hard;$('#hardT').classList.toggle('on',hard)};
+const ed=namesEditor($('#nameIn'),$('#addBtn'),$('#names'),'efNames');
+ed.onchange=n=>{$('#needMore').style.display=n.length<2?'block':'none';$('#startBtn').disabled=n.length<2};
+
+let P=[],round=0,usedL=[],L='',left=0,tid=null,catArr=[];
+$('#startBtn').onclick=()=>{
+  if(!cats.size)['اسم','فامیل','شهر'].forEach(c=>cats.add(c));
+  catArr=CATS.filter(c=>cats.has(c));
+  store.set('ef',{c:catArr,t:secs,h:hard});
+  P=ed.names.map(n=>({name:n,score:0,last:0}));round=0;usedL=[];
+  newRound();
+};
+function catsHtml(box){box.innerHTML='';catArr.forEach(c=>{const s=document.createElement('span');s.textContent=c;box.appendChild(s)})}
+function newRound(){
+  round++;L='';
+  $('#roundTag').textContent='دور '+fa(round);$('#letter').textContent='؟';$('#goBtn').disabled=true;$('#spinBtn').disabled=false;
+  catsHtml($('#catlist'));show('pick');
+}
+$('#spinBtn').onclick=()=>{
+  const pool=(hard?EASY.concat(HARD):EASY).filter(x=>!usedL.includes(x));
+  const choices=pool.length?pool:(hard?EASY.concat(HARD):EASY);
+  L=pick(choices);usedL.push(L);
+  $('#spinBtn').disabled=true;const el=$('#letter');el.classList.add('spin');
+  let n=0;const iv=setInterval(()=>{el.textContent=pick(choices);beep(400+Math.random()*400,.04,.12);if(++n>14){clearInterval(iv);el.classList.remove('spin');el.textContent=L;beep(1046,.25);$('#goBtn').disabled=false;$('#spinBtn').disabled=false;$('#spinBtn').textContent='🎲 یک حرف دیگر'}},90);
+};
+$('#goBtn').onclick=()=>{
+  $('#letter2').textContent=L;$('#roundTag2').textContent='دور '+fa(round)+' · حرف «'+L+'»';catsHtml($('#catlist2'));
+  show('run');beep(660,.15);
+  clearInterval(tid);
+  if(!secs){$('#clock').textContent='∞';return}
+  left=secs;$('#clock').textContent=fmt(left);$('#clock').style.color='';
+  tid=setInterval(()=>{left--;$('#clock').textContent=fmt(left);
+    if(left<=10&&left>0){beep(900,.06);$('#clock').style.color='var(--bad)'}
+    if(left<=0){clearInterval(tid);beep(300,.6);setTimeout(()=>beep(220,.8),300);toScore()}},1000);
+};
+$('#stopBtn').onclick=()=>{clearInterval(tid);beep(500,.3);toScore()};
+const maxPts=()=>catArr.length*10;
+function toScore(){
+  P.forEach(p=>p.last=0);renderScore();show('score');
+}
+function renderScore(){
+  const box=$('#scoreList');box.innerHTML='';
+  P.forEach(p=>{const d=document.createElement('div');d.className='prow';
+    d.innerHTML='<div class="nm"><span></span><small>مجموع: '+fa(p.score)+'</small></div><div class="qs"><button type="button" data-d="10">+۱۰</button><button type="button" data-d="5">+۵</button><b>'+fa(p.last)+'</b><button type="button" data-d="-5">−۵</button></div>';
+    d.querySelector('span').textContent=p.name;
+    d.querySelectorAll('button').forEach(b=>b.onclick=()=>{p.last=Math.max(0,Math.min(maxPts(),p.last+ +b.dataset.d));renderScore()});
+    box.appendChild(d)});
+}
+function commit(){P.forEach(p=>{p.score+=p.last;p.last=0})}
+$('#saveBtn').onclick=()=>{commit();newRound()};
+$('#endBtn').onclick=()=>{commit();finish()};
+function finish(){
+  const s=P.slice().sort((a,b)=>b.score-a.score);
+  $('#winner').textContent=s.length>1&&s[0].score===s[1].score?'مساوی شد!':s[0].name+' برنده شد!';
+  $('#finalBoard').innerHTML='';s.forEach((x,i)=>{const d=document.createElement('div');d.className='li';d.innerHTML='<span></span><b>'+fa(x.score)+'</b>';d.firstChild.textContent=(['🥇','🥈','🥉'][i]||'')+' '+x.name;$('#finalBoard').appendChild(d)});
+  show('final');
+}
+</script>
+
+<script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body>
+</html>
