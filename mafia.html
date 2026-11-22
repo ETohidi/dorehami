@@ -75,6 +75,7 @@ p{line-height:1.9}
 :root{--accent:#dc2626;--accent2:#7c3aed;--glow:rgba(220,38,38,.25)}
 .reveal.m{background:linear-gradient(160deg,#991b1b,#1f0a0a);border:2px solid #ef4444}
 .reveal.c{background:linear-gradient(160deg,#1d4ed8,#0f172a);border:2px solid #60a5fa}
+.reveal.n{background:linear-gradient(160deg,#6d28d9,#1e1b4b);border:2px solid #a78bfa}
 .script{background:var(--card2);border-right:4px solid var(--accent);border-radius:14px;padding:14px 16px;font-size:19px;font-weight:700;line-height:1.9}
 .script::before{content:"🎙️ بخوانید:";display:block;font-size:13px;color:var(--muted);font-weight:600}
 .note{font-size:14px;color:var(--muted);line-height:1.8}
@@ -108,13 +109,16 @@ p{line-height:1.9}
     <p class="note" style="margin:8px 0 0">گرداننده جزو بازیکنان نیست. حداقل ۵ بازیکن لازم است.</p>
   </div>
   <div class="card">
+    <h2>سناریو</h2>
+    <div class="chips" id="scn" style="margin-bottom:14px"></div>
     <div class="row"><h2 style="margin:0">نقش‌ها</h2><button class="chip" id="autoBtn">✨ چینش پیشنهادی</button></div>
     <div id="roleSteps" style="margin-top:12px"></div>
     <div class="row"><div class="lbl">😐 شهروند ساده</div><b id="citCount" style="font-size:19px;padding-left:14px"></b></div>
     <p class="note" id="roleErr" style="color:var(--bad);margin:8px 0 0"></p>
   </div>
   <div class="card">
-    <div class="row"><div class="lbl">شب اول: فقط معارفه<small>در شب اول کسی حذف نمی‌شود</small></div><button class="toggle" id="introT"></button></div>
+    <div class="row" id="introRow"><div class="lbl">شب اول: فقط معارفه<small>در شب اول کسی حذف نمی‌شود</small></div><button class="toggle" id="introT"></button></div>
+    <div class="row" id="cardsRow"><div class="lbl">کارت‌های حرکت آخر<small>بازیکنِ اخراجی با رأی، یک کارت می‌کشد</small></div><button class="toggle" id="cardsT"></button></div>
     <div class="row"><div class="lbl">زمان صحبت هر نفر</div><div class="chips" id="talk"></div></div>
   </div>
   <button class="btn primary" id="startBtn">پخش نقش‌ها</button>
@@ -210,42 +214,64 @@ function stepper(el,min,max,val,on){el.innerHTML='<button type="button">+</butto
 function fmt(s){s=Math.max(0,s);return fa(Math.floor(s/60))+':'+fa(String(s%60).padStart(2,'0'))}
 function namesEditor(input,addBtn,box,key,min){let names=store.get('players',null)||store.get(key,[]);function render(){box.innerHTML='';names.forEach((n,i)=>{const d=document.createElement('div');d.className='name';d.innerHTML='<span></span><button type="button">✕</button>';d.firstChild.textContent=n;d.lastChild.onclick=()=>{names.splice(i,1);save()};box.appendChild(d)});ed.onchange&&ed.onchange(names)}function save(){store.set('players',names);render()}function add(){const v=input.value.trim();if(!v)return;v.split(/[،,\n]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!names.includes(s))names.push(s)});input.value='';save();input.focus()}addBtn.onclick=add;input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});const ed={get names(){return names},render,onchange:null};setTimeout(render);return ed}
 
+let P=[],G=null,tid=null;
 const ROLES={
  godfather:{t:'پدرخوانده',e:'🎩',team:'m',d:'رئیس مافیا. تصمیم نهایی شلیک شب با توست. استعلام کارآگاه درباره‌ی تو «منفی» است.'},
  mafia:{t:'مافیا',e:'🔫',team:'m',d:'عضو تیم مافیا. هر شب با هم‌تیمی‌هایت بیدار می‌شوی و یک نفر را برای حذف انتخاب می‌کنید.'},
  doctor:{t:'دکتر',e:'🩺',team:'c',d:'هر شب یک نفر را نجات می‌دهی. خودت را فقط یک بار در کل بازی می‌توانی نجات دهی.'},
  detective:{t:'کارآگاه',e:'🔍',team:'c',d:'هر شب از یک نفر استعلام می‌گیری و گرداننده با اشاره می‌گوید مافیاست یا نه.'},
  sniper:{t:'تک‌تیرانداز',e:'🎯',team:'c',d:'دو تیر داری. شب می‌توانی به کسی شلیک کنی؛ اگر مافیا باشد حذف می‌شود، اما اگر شهروند باشد خودت حذف می‌شوی!'},
+ matador:{t:'ماتادور',e:'🐂',team:'m',d:'عضو مافیا. هر شب توانایی یک نفر را برای همان شب می‌گیری. دو شب پشت سر هم نمی‌توانی یک نفر را انتخاب کنی.'},
+ saul:{t:'ساول گودمن',e:'💼',team:'m',d:'عضو مافیا. وقتی یکی از هم‌تیمی‌هایت حذف شد، یک بار می‌توانی به‌جای شلیک شب، یک «شهروند ساده» را بخری تا مافیا شود. اگر نقش‌دار را انتخاب کنی، خرید باطل می‌شود و آن شب شلیکی هم نیست.'},
+ watson:{t:'دکتر واتسون',e:'⚕️',team:'c',d:'هر شب یک نفر را از تیر مافیا نجات می‌دهی. خودت را فقط یک بار در کل بازی می‌توانی نجات دهی.'},
+ leon:{t:'لئون حرفه‌ای',e:'🎯',team:'c',d:'دو تیر و یک جلیقه داری. شب می‌توانی به یک مافیا شلیک کنی؛ اگر به شهروند شلیک کنی خودت حذف می‌شوی. جلیقه یک بار تو را از تیر مافیا نجات می‌دهد.'},
+ kane:{t:'همشهری کین',e:'🗞️',team:'c',d:'یک بار در بازی، شب یک نفر را به گرداننده نشان می‌دهی. اگر مافیا باشد، صبح هویتش به همه اعلام می‌شود و تو شب بعد (بدون امکان نجات) از بازی خارج می‌شوی. اگر مافیا نباشد، توانایی‌ات هدر می‌رود.'},
+ constantine:{t:'کنستانتین',e:'🔮',team:'c',d:'یک بار در بازی، شب یک بازیکن حذف‌شده را به بازی برمی‌گردانی؛ به شرطی که هویتش افشا نشده و سلاخی نشده باشد.'},
+ nostradamus:{t:'نوستراداموس',e:'🌀',team:'n',d:'نقش مستقل. شب معارفه سه نفر را انتخاب می‌کنی و گرداننده می‌گوید چند مافیا بینشان است (پدرخوانده شمرده نمی‌شود). بعد ساید خودت را انتخاب می‌کنی؛ اگر ۲ مافیا یا بیشتر ببینی باید با مافیا باشی. تیر به تو اثر ندارد و فقط با سلاخی یا رأی خارج می‌شوی. با ساید انتخابی‌ات برنده می‌شوی.'},
  citizen:{t:'شهروند ساده',e:'😐',team:'c',d:'نقش ویژه‌ای نداری. با دقت و استدلال، مافیاها را پیدا کن و در رأی‌گیری بیرونشان کن.'}
 };
-const TEAM={m:'تیم مافیا',c:'تیم شهروندان'};
-$('#rulesRoles').innerHTML=Object.values(ROLES).map(r=>'<p><b>'+r.e+' '+r.t+'</b> <span class="tag">'+TEAM[r.team]+'</span><br>'+r.d+'</p>').join('');
+const GF_GODFATHER='رئیس مافیا با یک جلیقه (یک بار از تیر لئون جان سالم به در می‌بری). هر شب تصمیم با توست: شلیک، یا «حس ششم» (نقش دقیق یک نفر را حدس بزن؛ اگر درست باشد او «سلاخی» می‌شود و هیچ چیز نجاتش نمی‌دهد)، یا خرید ساول گودمن. همشهری کین تو را مافیا می‌بیند، ولی برای نوستراداموس شهروند حساب می‌شوی.';
+const desc=k=>(G&&G.scn==='gf'||scn==='gf')&&k==='godfather'?GF_GODFATHER:ROLES[k].d;
+const TEAM={m:'تیم مافیا',c:'تیم شهروندان',n:'مستقل'};
+const SCN={classic:{name:'کلاسیک',max:{godfather:1,mafia:5,doctor:1,detective:1,sniper:1}},
+ gf:{name:'پدرخوانده',max:{godfather:1,matador:1,saul:1,mafia:3,watson:1,leon:1,kane:1,constantine:1,nostradamus:1}}};
+const CARDS={reveal:{t:'افشای هویت',e:'🪪',d:'نقش بازیکن اخراج‌شده برای همه اعلام می‌شود.'},swap:{t:'تغییر چهره',e:'🎭',d:'بازیکن اخراج‌شده نقشش را با یکی از بازیکنان زنده عوض می‌کند و خودش با نقش او خارج می‌شود.'},silence:{t:'سکوت بره‌ها',e:'🤐',d:'بازیکن اخراج‌شده دو نفر را انتخاب می‌کند که روز بعد حق صحبت (حتی دفاع) ندارند. اگر تعداد بازیکنان به نصف رسیده باشد، فقط یک نفر.'},mind:{t:'ذهن زیبا',e:'🧠',d:'اگر بازیکن اخراج‌شده نوستراداموس را درست حدس بزند، به بازی برمی‌گردد و نوستراداموس به‌جای او خارج می‌شود.'},cuff:{t:'دستبند',e:'⛓️',d:'بازیکن اخراج‌شده یک نفر را انتخاب می‌کند که امشب توانایی‌اش را از دست می‌دهد.'}};
 
-const cfg=store.get('mafiaCfg',{intro:true,talk:45});
-let intro=cfg.intro,talk=cfg.talk;
+let scn='classic';
+function rulesHtml(){const ks=Object.keys(SCN[scn].max).concat('citizen');$('#rulesRoles').innerHTML=ks.map(k=>{const r=ROLES[k];return '<p><b>'+r.e+' '+r.t+'</b> <span class="tag">'+TEAM[r.team]+'</span><br>'+desc(k)+'</p>'}).join('')+(scn==='gf'?'<h2 style="margin-top:14px">کارت‌های حرکت آخر</h2>'+Object.values(CARDS).map(c=>'<p><b>'+c.e+' '+c.t+'</b><br>'+c.d+'</p>').join(''):'')}
+
+const cfg=store.get('mafiaCfg',{intro:true,talk:45,scn:'classic',cards:true});
+let intro=cfg.intro,talk=cfg.talk,useCards=cfg.cards!==false;scn=cfg.scn||'classic';
 $('#introT').classList.toggle('on',intro);$('#introT').onclick=()=>{intro=!intro;$('#introT').classList.toggle('on',intro)};
+$('#cardsT').classList.toggle('on',useCards);$('#cardsT').onclick=()=>{useCards=!useCards;$('#cardsT').classList.toggle('on',useCards)};
 const tb=$('#talk');[[30,'۳۰'],[45,'۴۵'],[60,'۶۰'],[90,'۹۰']].forEach(([v,l])=>{const b=document.createElement('button');b.className='chip'+(v===talk?' on':'');b.textContent=l+' ث';b.onclick=()=>{talk=v;[...tb.children].forEach(c=>c.classList.remove('on'));b.classList.add('on')};tb.appendChild(b)});
 
-let ed=null;const RS={};const maxR={godfather:1,mafia:5,doctor:1,detective:1,sniper:1};
+let ed=null,RS={};
 const rsBox=$('#roleSteps');
-Object.keys(maxR).forEach(k=>{const row=document.createElement('div');row.className='row';row.innerHTML='<div class="lbl">'+ROLES[k].e+' '+ROLES[k].t+'</div><div class="stepper"></div>';rsBox.appendChild(row);RS[k]=stepper(row.querySelector('.stepper'),0,maxR[k],0,updRoles)});
+function buildSteppers(){rsBox.innerHTML='';RS={};const mx=SCN[scn].max;Object.keys(mx).forEach(k=>{const row=document.createElement('div');row.className='row';row.innerHTML='<div class="lbl">'+ROLES[k].e+' '+ROLES[k].t+'</div><div class="stepper"></div>';rsBox.appendChild(row);RS[k]=stepper(row.querySelector('.stepper'),0,mx[k],0,updRoles)});
+ $('#introRow').style.display=scn==='classic'?'':'none';$('#cardsRow').style.display=scn==='gf'?'':'none';rulesHtml()}
+const scBox=$('#scn');[['classic','🌙 کلاسیک'],['gf','🎩 پدرخوانده']].forEach(([k,l])=>{const b=document.createElement('button');b.className='chip'+(k===scn?' on':'');b.textContent=l;b.onclick=()=>{scn=k;[...scBox.children].forEach(c=>c.classList.remove('on'));b.classList.add('on');buildSteppers();suggest()};scBox.appendChild(b)});
+buildSteppers();
 ed=namesEditor($('#nameIn'),$('#addBtn'),$('#names'),'mafiaNames');
 let lastN=-1;
 ed.onchange=n=>{$('#pc').textContent='('+fa(n.length)+' نفر)';if(n.length!==lastN){lastN=n.length;suggest()}else updRoles()};
-function suggest(){const n=ed.names.length;const mt=Math.max(1,Math.round(n/3.5));const gf=mt>=2?1:0;RS.godfather.set(gf);RS.mafia.set(mt-gf);RS.doctor.set(n>=5?1:0);RS.detective.set(n>=6?1:0);RS.sniper.set(n>=9?1:0);updRoles()}
+function suggest(){const n=ed.names.length;const mt=Math.max(1,Math.round(n/3.5));
+ if(scn==='classic'){const gf=mt>=2?1:0;RS.godfather.set(gf);RS.mafia.set(mt-gf);RS.doctor.set(n>=5?1:0);RS.detective.set(n>=6?1:0);RS.sniper.set(n>=9?1:0)}
+ else{RS.godfather.set(1);RS.matador.set(mt>=2?1:0);RS.saul.set(mt>=3?1:0);RS.mafia.set(Math.max(0,Math.min(3,mt-3)));RS.watson.set(1);RS.leon.set(1);RS.kane.set(n>=8?1:0);RS.constantine.set(n>=10?1:0);RS.nostradamus.set(n>=11?1:0)}
+ updRoles()}
 $('#autoBtn').onclick=suggest;
 function counts(){const c={};Object.keys(RS).forEach(k=>c[k]=RS[k]?RS[k].v:0);c.citizen=ed?ed.names.length-Object.values(c).reduce((a,b)=>a+b,0):0;return c}
-function updRoles(){if(!ed||!RS.sniper)return;const c=counts();$('#citCount').textContent=fa(Math.max(0,c.citizen));let err='';const n=ed.names.length;const mt=c.godfather+c.mafia;
- if(n<5)err='حداقل ۵ بازیکن اضافه کنید.';else if(c.citizen<0)err='تعداد نقش‌ها از بازیکنان بیشتر است.';else if(mt<1)err='حداقل یک مافیا لازم است.';else if(mt>=n-mt)err='تعداد مافیا باید کمتر از شهروندان باشد.';
+function updRoles(){if(!ed||!Object.keys(RS).length)return;const c=counts();$('#citCount').textContent=fa(Math.max(0,c.citizen));let err='';const n=ed.names.length;
+ const mt=Object.keys(c).filter(k=>ROLES[k].team==='m').reduce((a,k)=>a+c[k],0);const ct=Object.keys(c).filter(k=>ROLES[k].team==='c').reduce((a,k)=>a+c[k],0);
+ if(n<5)err='حداقل ۵ بازیکن اضافه کنید.';else if(c.citizen<0)err='تعداد نقش‌ها از بازیکنان بیشتر است.';else if(mt<1)err='حداقل یک مافیا لازم است.';else if(mt>=ct)err='تعداد مافیا باید کمتر از شهروندان باشد.';
  $('#roleErr').textContent=err;$('#startBtn').disabled=!!err}
 
-let P=[],G=null,tid=null;
 function startGame(names){
   const c=counts();let roles=[];Object.entries(c).forEach(([k,v])=>{for(let i=0;i<v;i++)roles.push(k)});
   roles=shuffle(roles);
-  P=names.map((n,i)=>({name:n,role:roles[i],alive:true}));
-  G={night:0,day:0,docSelf:false,bullets:2,log:[],i:0,lastNames:names.slice()};
-  store.set('mafiaCfg',{intro,talk});
+  P=names.map((n,i)=>({name:n,role:roles[i],alive:true,revealed:false,slaughtered:false}));
+  G={scn,night:0,day:0,docSelf:false,bullets:2,log:[],i:0,lastNames:names.slice(),leonVest:true,gfVest:true,saulUsed:false,kaneUsed:false,kaneDue:null,constUsed:false,lastMatador:null,cuffed:null,silenceNext:[],nostSide:null,deck:shuffle(Object.keys(CARDS))};
+  store.set('mafiaCfg',{intro,talk,scn,cards:useCards});
   nextPass();
 }
 $('#startBtn').onclick=()=>startGame(ed.names.slice());
@@ -254,7 +280,7 @@ function nextPass(){if(G.i>=P.length){show('handoff');return}$('#passName').text
 $('#seeBtn').onclick=()=>{
   const p=P[G.i],r=ROLES[p.role];const box=$('#roleBox');box.className='reveal '+r.team;
   let mates='';if(r.team==='m'){const m=P.filter(x=>x!==p&&ROLES[x.role].team==='m');if(m.length)mates='<div class="pill" style="background:#0005;color:#fff;border:0">هم‌تیمی‌ها: '+m.map(x=>esc(x.name)+' ('+ROLES[x.role].t+')').join('، ')+'</div>'}
-  box.innerHTML='<div style="color:#ffffffbb">'+esc(p.name)+'، نقش تو:</div><div class="emoji">'+r.e+'</div><div class="big">'+r.t+'</div><div class="pill" style="background:#ffffff22;color:#fff;border:0">'+TEAM[r.team]+'</div><p style="margin:0;color:#ffffffdd;font-size:16px">'+r.d+'</p>'+mates;
+  box.innerHTML='<div style="color:#ffffffbb">'+esc(p.name)+'، نقش تو:</div><div class="emoji">'+r.e+'</div><div class="big">'+r.t+'</div><div class="pill" style="background:#ffffff22;color:#fff;border:0">'+TEAM[r.team]+'</div><p style="margin:0;color:#ffffffdd;font-size:16px">'+desc(p.role)+'</p>'+mates;
   show('role');
 };
 $('#hideBtn').onclick=()=>{G.i++;nextPass()};
@@ -263,6 +289,7 @@ $('#beginBtn').onclick=()=>{startNight()};
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 const alive=()=>P.filter(p=>p.alive);
 const team=p=>ROLES[p.role].team;
+const sideOf=p=>p.role==='nostradamus'?(G.nostSide||'n'):team(p);
 const has=role=>P.some(p=>p.role===role);
 const aliveRole=role=>P.find(p=>p.role===role&&p.alive);
 function log(s){G.log.push(s)}
@@ -276,19 +303,22 @@ function refreshStep(){if(!cur)return;const o=cur;const b=$('#stepBody');b.inner
   if(o.script){const s=document.createElement('div');s.className='script';s.textContent=o.script;b.appendChild(s)}
   if(o.html){const d=document.createElement('div');d.innerHTML=o.html;b.appendChild(d)}
   if(o.pick){const g=document.createElement('div');g.className='grid';
-    const list=alive();
-    list.forEach(p=>{const btn=document.createElement('button');btn.className='pb'+(o.sel===p?' sel':'');btn.innerHTML='<span class="tag">'+ROLES[p.role].e+'</span><span></span>';btn.lastChild.textContent=p.name;btn.disabled=o.pick.dis?o.pick.dis(p):false;btn.onclick=()=>{o.sel=p;o.chosen=true;o.pick.on&&o.pick.on(p);refreshStep()};g.appendChild(btn)});
+    const list=o.pick.list?o.pick.list():alive();
+    if(o.multi&&!Array.isArray(o.sel))o.sel=[];
+    list.forEach(p=>{const isSel=o.multi?o.sel.includes(p):o.sel===p;const btn=document.createElement('button');btn.className='pb'+(isSel?' sel':'');btn.innerHTML='<span class="tag">'+ROLES[p.role].e+'</span><span></span>';btn.lastChild.textContent=p.name;btn.disabled=o.pick.dis?o.pick.dis(p):false;btn.onclick=()=>{if(o.multi){const i=o.sel.indexOf(p);if(i>=0)o.sel.splice(i,1);else if(o.sel.length<o.multi)o.sel.push(p);o.chosen=o.sel.length===o.multi}else{o.sel=p;o.chosen=true;o.pick.on&&o.pick.on(p)}refreshStep()};g.appendChild(btn)});
     if(o.pick.none){const nb=document.createElement('button');nb.className='pb none'+(o.chosen&&o.sel===null?' sel':'');nb.textContent=o.pick.none;nb.onclick=()=>{o.sel=null;o.chosen=true;o.pick.on&&o.pick.on(null);refreshStep()};g.appendChild(nb)}
     b.appendChild(g)}
+  if(o.choices){const g=document.createElement('div');g.className='grid';o.choices.forEach(c=>{const btn=document.createElement('button');btn.className='pb'+(o.choice===c.k?' sel':'');btn.textContent=c.label;btn.onclick=()=>{o.choice=c.k;refreshStep()};g.appendChild(btn)});b.appendChild(g)}
   if(o.after){const d=document.createElement('div');d.innerHTML=o.after();b.appendChild(d)}
   const sp=document.createElement('div');sp.className='grow';b.appendChild(sp);
-  (o.btns||[]).forEach(x=>{const btn=document.createElement('button');btn.className='btn '+(x.cls||'primary');btn.textContent=x.label;btn.disabled=x.needPick&&!o.chosen;btn.onclick=x.fn;b.appendChild(btn)});
+  (o.btns||[]).forEach(x=>{const btn=document.createElement('button');btn.className='btn '+(x.cls||'primary');btn.textContent=x.label;btn.disabled=(x.needPick&&!o.chosen)||(x.needChoice&&!o.choice);btn.onclick=x.fn;b.appendChild(btn)});
   show('game');
 }
 
 /* ---------- night ---------- */
 let N;
 function startNight(){
+  if(G.scn==='gf')return startNightGF();
   G.night++;N={k:G.night,q:[],i:0,mt:null,ds:null,dt:null,st:null};
   const ph='🌙 شب '+fa(N.k);
   const isIntro=intro&&N.k===1;
@@ -343,13 +373,122 @@ function vote(){const ph='🗳️ روز '+fa(G.day);
     const p=cur.sel;
     if(p){p.alive=false;log('روز '+fa(G.day)+': '+p.name+' با رأی جمع حذف شد ('+ROLES[p.role].t+').')}else log('روز '+fa(G.day)+': کسی با رأی‌گیری حذف نشد.');
     beep(440,.25);
-    step({phase:ph,title:p?'حذف شد':'کسی حذف نشد',script:p?p.name+' از بازی حذف شد.':'امروز کسی از بازی بیرون نرفت.',html:p?'<div class="card"><div class="note">فقط برای گرداننده:</div>'+esc(p.name)+' — '+ROLES[p.role].e+' '+ROLES[p.role].t+'</div>':'',btns:[{label:'🌙 رفتن به شب',fn:()=>{if(!checkWin())startNight()}}]});
+    step({phase:ph,title:p?'حذف شد':'کسی حذف نشد',script:p?p.name+' از بازی حذف شد.':'امروز کسی از بازی بیرون نرفت.',html:p?'<div class="card"><div class="note">فقط برای گرداننده:</div>'+esc(p.name)+' — '+ROLES[p.role].e+' '+ROLES[p.role].t+'</div>':'',btns:[{label:p&&G.scn==='gf'&&useCards&&G.deck.length?'🃏 کشیدن کارت حرکت آخر':'🌙 رفتن به شب',fn:()=>{if(p&&G.scn==='gf'&&lastMove(p,ph))return;if(!checkWin())startNight()}}]});
   }}]});
+}
+
+
+/* ---------- پدرخوانده scenario ---------- */
+const rl=p=>ROLES[p.role].e+' '+ROLES[p.role].t;
+function blockedNote(role){const b=[N.mat,G.cuffed].filter(x=>x&&x.alive&&x.role===role);return b.length?'<div class="res n" style="font-size:16px">⛔ امشب '+(N.mat&&N.mat.role===role?'ماتادور':'دستبند')+' توانایی این نقش را گرفته؛ بیدارش کنید ولی انتخابش اثری ندارد.</div>':''}
+const isBlocked=role=>[N.mat,G.cuffed].some(x=>x&&x.alive&&x.role===role);
+function deadStep(ph,title,script){return step({phase:ph,title,script,html:'<p class="note">این نقش در بازی نیست یا حذف شده است. برای این‌که لو نرود، چند ثانیه صبر کنید و بعد ادامه دهید.</p>',btns:[{label:'ادامه',fn:nextN}]})}
+function startNightGF(){
+  G.night++;N={k:G.night,q:[],i:0,mode:null,mt:null,guess:null,mat:null,ws:null,ls:null,ks:null,cs:null};
+  const ph='🌙 شب '+fa(N.k);
+  const mlist=()=>P.filter(p=>team(p)==='m').map(p=>(p.alive?'':'☠️ ')+esc(p.name)+' ('+ROLES[p.role].t+')').join('، ');
+  N.q.push(()=>step({phase:ph,title:'شب شد',script:'شب '+(N.k===1?'معارفه':fa(N.k))+' است. همه سرها پایین و چشم‌ها بسته.',btns:[{label:'ادامه',fn:nextN}]}));
+  if(N.k===1){
+    const ns=aliveRole('nostradamus');
+    if(ns){
+      N.q.push(()=>step({phase:ph,title:'🌀 نوستراداموس',script:'نوستراداموس بیدار شود و سه نفر را نشان دهد.',multi:3,pick:{dis:p=>p===ns},btns:[{label:'نشان داد',needPick:true,fn:()=>{N.three=cur.sel.slice();nextN()}}]}));
+      N.q.push(()=>{const cnt=N.three.filter(p=>team(p)==='m'&&p.role!=='godfather').length;
+        step({phase:ph,title:'🌀 نوستراداموس',script:'با انگشت به نوستراداموس نشان دهید: '+fa(cnt)+' مافیا بین این سه نفر است. حالا سایدش را انتخاب کند.',html:'<div class="res n">'+fa(cnt)+' مافیا</div><p class="note">'+(cnt>=2?'چون ۲ مافیا یا بیشتر دید، باید با مافیا باشد.':'می‌تواند شهروند یا مافیا را انتخاب کند.')+'</p>',btns:[{label:'🏙️ ساید شهروند',cls:'',fn:()=>{if(cnt>=2)return;G.nostSide='c';log('شب معارفه: نوستراداموس ساید شهروند را انتخاب کرد.');nextN()}},{label:'🔫 ساید مافیا',fn:()=>{G.nostSide='m';log('شب معارفه: نوستراداموس ساید مافیا را انتخاب کرد.');nextN()}}]});
+        if(cnt>=2){const bs=[...document.querySelectorAll('#stepBody .btn')];bs[0].disabled=true}});
+    }
+    N.q.push(()=>step({phase:ph,title:'معارفه‌ی مافیا',script:'تیم مافیا بیدار شود و هم‌تیمی‌هایش را بشناسد.',html:'<div class="card"><div class="note">مافیاها:</div><b>'+mlist()+'</b></div>',btns:[{label:'مافیا خوابید ✓',fn:nextN}]}));
+    N.q.push(()=>{G.cuffed=null;step({phase:'☀️ صبح '+fa(1),title:'صبح شد!',script:'همه بیدار شوند. شب معارفه بود؛ کسی حذف نشد.',btns:[{label:'ادامه',fn:()=>startDay()}]})});
+    N.q[0]();return;
+  }
+  // mafia action
+  N.q.push(()=>{if(!alive().some(p=>team(p)==='m')){N.mode=null;N.i+=2;return nextN()}
+    const gf=aliveRole('godfather');const lost=P.some(p=>team(p)==='m'&&!p.alive);const canBuy=aliveRole('saul')&&!G.saulUsed&&lost;
+    const cuffNote=G.cuffed&&G.cuffed.alive&&G.cuffed.role==='godfather'?'<div class="res n" style="font-size:16px">⛔ پدرخوانده امشب دستبند دارد؛ تصمیمش اثری ندارد.</div>':'';
+    step({phase:ph,title:'🔫 مافیا',script:'تیم مافیا بیدار شود. پدرخوانده تصمیم بگیرد: شلیک، حس ششم یا خرید.',html:'<div class="card"><div class="note">مافیاها:</div><b>'+mlist()+'</b></div>'+cuffNote,btns:[
+      {label:'🔫 شلیک',fn:()=>{N.mode='shot';nextN()}},
+      {label:'👁️ حس ششم'+(gf?'':' (پدرخوانده حذف شده)'),cls:gf?'':'ghost',fn:()=>{if(!gf)return;N.mode='sixth';nextN()}},
+      {label:'💼 خرید ساول گودمن'+(canBuy?'':' (فعال نیست)'),cls:canBuy?'':'ghost',fn:()=>{if(!canBuy)return;N.mode='buy';nextN()}},
+      {label:'بدون اقدام',cls:'ghost',fn:()=>{N.mode=null;N.i+=2;nextN()}}]})});
+  N.q.push(()=>{const T={shot:'هدف شلیک را انتخاب کنید',sixth:'برای حس ششم چه کسی را انتخاب کردند؟',buy:'ساول گودمن چه کسی را خرید؟'};
+    step({phase:ph,title:T[N.mode],pick:{dis:p=>N.mode!=='shot'&&team(p)==='m',on:p=>N.mt=p},btns:[{label:N.mode==='sixth'?'بعدی: حدس نقش':'ثبت',needPick:true,fn:()=>{if(N.mode!=='sixth')N.i++;nextN()}}]})});
+  N.q.push(()=>{const ks=[...new Set(P.map(p=>p.role))].filter(k=>ROLES[k].team!=='m');
+    step({phase:ph,title:'👁️ حس ششم',script:'پدرخوانده نقش دقیق '+N.mt.name+' را حدس بزند.',choices:ks.map(k=>({k,label:ROLES[k].e+' '+ROLES[k].t})),btns:[{label:'ثبت حدس',needChoice:true,fn:()=>{N.guess=cur.choice;nextN()}}]})});
+  N.q.push(()=>step({phase:ph,title:'مافیا بخوابد',script:'مافیا بخوابد.',btns:[{label:'ادامه',fn:nextN}]}));
+  // matador
+  if(has('matador'))N.q.push(()=>{const m=aliveRole('matador');if(!m)return deadStep(ph,'🐂 ماتادور','ماتادور بیدار شود.');
+    step({phase:ph,title:'🐂 ماتادور',script:'ماتادور بیدار شود و توانایی یک نفر را برای امشب بگیرد.',html:G.lastMatador?'<p class="note">'+esc(G.lastMatador.name)+' را دیشب انتخاب کرده؛ امشب نمی‌تواند.</p>':'',pick:{dis:p=>p===m||p===G.lastMatador,none:'کسی را انتخاب نکرد',on:p=>N.mat=p},btns:[{label:'ثبت و «ماتادور بخوابد»',needPick:true,fn:()=>{G.lastMatador=N.mat;nextN()}}]})});
+  if(has('watson'))N.q.push(()=>{const d=aliveRole('watson');if(!d)return deadStep(ph,'⚕️ دکتر واتسون','دکتر واتسون بیدار شود.');
+    step({phase:ph,title:'⚕️ دکتر واتسون',script:'دکتر واتسون بیدار شود و یک نفر را نجات دهد.',html:blockedNote('watson')+(G.docSelf?'<p class="note">قبلاً یک بار خودش را نجات داده است.</p>':''),pick:{dis:p=>p===d&&G.docSelf,on:p=>N.ws=p},btns:[{label:'ثبت و «واتسون بخوابد»',needPick:true,fn:nextN}]})});
+  if(has('leon'))N.q.push(()=>{const l=aliveRole('leon');if(!l||G.bullets<=0)return deadStep(ph,'🎯 لئون','لئون بیدار شود.');
+    step({phase:ph,title:'🎯 لئون حرفه‌ای',script:'لئون بیدار شود. اگر می‌خواهد شلیک کند، هدفش را نشان دهد.',html:blockedNote('leon')+'<p class="note">تیرهای باقی‌مانده: '+fa(G.bullets)+'</p>',pick:{dis:p=>p===l,none:'شلیک نمی‌کند',on:p=>N.ls=p},btns:[{label:'ثبت و «لئون بخوابد»',needPick:true,fn:nextN}]})});
+  if(has('kane'))N.q.push(()=>{const k=aliveRole('kane');if(!k||G.kaneUsed)return deadStep(ph,'🗞️ همشهری کین','همشهری کین بیدار شود.');
+    step({phase:ph,title:'🗞️ همشهری کین',script:'همشهری کین بیدار شود. اگر می‌خواهد کسی را نشان کند، نشان دهد.',html:blockedNote('kane'),pick:{dis:p=>p===k,none:'امشب استفاده نمی‌کند',on:p=>N.ks=p},btns:[{label:'ثبت و «کین بخوابد»',needPick:true,fn:nextN}]})});
+  if(has('constantine'))N.q.push(()=>{const c=aliveRole('constantine');const el=P.filter(p=>!p.alive&&!p.revealed&&!p.slaughtered);if(!c||G.constUsed)return deadStep(ph,'🔮 کنستانتین','کنستانتین بیدار شود.');
+    step({phase:ph,title:'🔮 کنستانتین',script:'کنستانتین بیدار شود. اگر می‌خواهد کسی را برگرداند، نشان دهد.',html:blockedNote('constantine')+(el.length?'':'<p class="note">فعلاً کسی برای برگرداندن نیست.</p>'),pick:{list:()=>el,none:'کسی را برنمی‌گرداند',on:p=>N.cs=p},btns:[{label:'ثبت و «کنستانتین بخوابد»',needPick:true,fn:nextN}]})});
+  N.q.push(resolveGF);
+  N.q[0]();
+}
+function resolveGF(){
+  const dead=new Set(),k=fa(N.k),morn=[],secret=[];
+  const save=isBlocked('watson')?null:N.ws;
+  if(N.ws&&!isBlocked('watson')&&N.ws.role==='watson')G.docSelf=true;
+  if(G.kaneDue===N.k){const kn=aliveRole('kane');if(kn){dead.add(kn);log('شب '+k+': همشهری کین با تیر غیب از بازی خارج شد.')}G.kaneDue=null}
+  const gfCuffed=G.cuffed&&G.cuffed.alive&&G.cuffed.role==='godfather';
+  const t=N.mt;
+  if(N.mode&&t&&!gfCuffed){
+    if(N.mode==='shot'){
+      if(t.role==='nostradamus')log('شب '+k+': مافیا به نوستراداموس شلیک کرد؛ تیر اثری نداشت.');
+      else if(t===save)log('شب '+k+': مافیا به '+t.name+' شلیک کرد، اما دکتر واتسون نجاتش داد.');
+      else if(t.role==='leon'&&G.leonVest){G.leonVest=false;log('شب '+k+': تیر مافیا به جلیقه‌ی لئون ('+t.name+') خورد.')}
+      else{dead.add(t);log('شب '+k+': مافیا '+t.name+' را حذف کرد.')}
+    }else if(N.mode==='sixth'){
+      if(t.role===N.guess){dead.add(t);t.slaughtered=true;log('شب '+k+': حس ششم پدرخوانده درست بود؛ '+t.name+' ('+ROLES[t.role].t+') سلاخی شد.')}
+      else log('شب '+k+': حس ششم پدرخوانده درباره‌ی '+t.name+' اشتباه بود ('+ROLES[N.guess].t+').');
+    }else if(N.mode==='buy'){
+      G.saulUsed=true;
+      if(t.role==='citizen'){t.role='mafia';log('شب '+k+': ساول گودمن '+t.name+' را خرید و او مافیا شد.');secret.push('💼 خرید موفق: '+esc(t.name)+' حالا مافیاست. او را بیدار کنید و به تیم مافیا معرفی کنید.')}
+      else{log('شب '+k+': خرید ساول گودمن ناموفق بود ('+t.name+' شهروند ساده نبود).');secret.push('💼 خرید ناموفق بود؛ '+esc(t.name)+' شهروند ساده نبود.')}
+    }
+  }else if(gfCuffed)log('شب '+k+': پدرخوانده دستبند داشت؛ مافیا اقدامی نکرد.');
+  const l=aliveRole('leon');
+  if(N.ls&&l&&!isBlocked('leon')){G.bullets--;const s=N.ls;
+    if(s.role==='nostradamus')log('شب '+k+': لئون به نوستراداموس شلیک کرد؛ اثری نداشت.');
+    else if(sideOf(s)==='m'){if(s===save)log('شب '+k+': لئون به '+s.name+' زد، اما واتسون نجاتش داد.');else if(s.role==='godfather'&&G.gfVest){G.gfVest=false;log('شب '+k+': تیر لئون به جلیقه‌ی پدرخوانده خورد.')}else{dead.add(s);log('شب '+k+': لئون '+s.name+' (مافیا) را زد.')}}
+    else{if(l===save)log('شب '+k+': لئون به شهروند زد، اما واتسون نجاتش داد.');else{dead.add(l);log('شب '+k+': لئون به شهروند ('+s.name+') شلیک کرد و خودش حذف شد.')}}}
+  const kn=aliveRole('kane');let kaneMsg='';
+  if(N.ks&&kn&&!isBlocked('kane')&&!G.kaneUsed){G.kaneUsed=true;
+    if(team(N.ks)==='m'){N.ks.revealed=true;G.kaneDue=N.k+1;kaneMsg='همشهری کین درست حدس زد: '+N.ks.name+' مافیاست!';log('شب '+k+': همشهری کین '+N.ks.name+' را نشان کرد؛ مافیا بود و افشا شد.')}
+    else log('شب '+k+': همشهری کین '+N.ks.name+' را نشان کرد؛ مافیا نبود و توانایی هدر رفت.')}
+  const cn=aliveRole('constantine');let revived=null;
+  if(N.cs&&cn&&!isBlocked('constantine')&&!G.constUsed){G.constUsed=true;revived=N.cs}
+  dead.forEach(p=>p.alive=false);
+  if(revived&&!dead.has(revived)){revived.alive=true;log('شب '+k+': کنستانتین '+revived.name+' را به بازی برگرداند.')}
+  G.cuffed=null;
+  const names=[...dead].map(p=>p.name);
+  let msg=names.length?'دیشب '+names.join(' و ')+' از بازی خارج '+(names.length>1?'شدند':'شد')+'.':'دیشب کسی از بازی خارج نشد.';
+  if(revived&&revived.alive)msg+=' '+revived.name+' به بازی برگشت.';
+  if(kaneMsg)msg+=' '+kaneMsg;
+  if(G.silenceNext.length){msg+=' امروز '+G.silenceNext.map(p=>p.name).join(' و ')+' حق صحبت ندارد.';G.silenceNext=[]}
+  beep(784,.2);
+  step({phase:'☀️ صبح '+fa(N.k),title:'صبح شد!',script:'همه بیدار شوند. '+msg,html:(secret.length||names.length)?'<div class="card"><div class="note">فقط برای گرداننده:</div>'+secret.map(s=>'<div>'+s+'</div>').join('')+[...dead].map(p=>'<div>'+esc(p.name)+' — '+rl(p)+'</div>').join('')+'</div>':'',btns:[{label:'ادامه',fn:()=>{if(!checkWin())startDay()}}]});
+}
+function lastMove(p,ph){
+  if(!useCards||!G.deck.length)return false;
+  const c=G.deck.pop(),C=CARDS[c];log('روز '+fa(G.day)+': '+p.name+' کارت «'+C.t+'» را کشید.');
+  const html='<div class="res n">'+C.e+' '+C.t+'</div><p class="note">'+C.d+'</p>';
+  const go=()=>{if(!checkWin())startNight()};
+  const fin={label:'🌙 رفتن به شب',fn:go};
+  if(c==='reveal'){p.revealed=true;step({phase:ph,title:'کارت حرکت آخر',script:p.name+' کارت «افشای هویت» را کشید. نقش او: '+ROLES[p.role].t,html,btns:[fin]});}
+  else if(c==='swap')step({phase:ph,title:'کارت حرکت آخر',script:p.name+' کارت «تغییر چهره» را کشید و نقشش را با یک نفر عوض می‌کند.',html,pick:{dis:q=>q===p},btns:[{label:'ثبت جابه‌جایی',needPick:true,fn:()=>{const q=cur.sel;const r=q.role;q.role=p.role;p.role=r;log('تغییر چهره: '+q.name+' حالا '+ROLES[q.role].t+' است.');step({phase:ph,title:'تغییر چهره',script:'ابتدای شب، به '+q.name+' نقش جدیدش را مخفیانه اطلاع دهید.',html:'<div class="card"><div class="note">فقط برای گرداننده:</div>'+esc(q.name)+' ← '+rl(q)+'<br>'+esc(p.name)+' (خارج‌شده) ← '+rl(p)+'</div>',btns:[fin]})}}]});
+  else if(c==='silence'){const n=alive().length<=Math.ceil(P.length/2)?1:2;step({phase:ph,title:'کارت حرکت آخر',script:p.name+' کارت «سکوت بره‌ها» را کشید و '+fa(n)+' نفر را برای سکوت فردا انتخاب می‌کند.',html,multi:n,pick:{},btns:[{label:'ثبت',needPick:true,fn:()=>{G.silenceNext=cur.sel.slice();log('سکوت بره‌ها: '+G.silenceNext.map(x=>x.name).join(' و '));go()}}]})}
+  else if(c==='mind')step({phase:ph,title:'کارت حرکت آخر',script:p.name+' کارت «ذهن زیبا» را کشید. حدس بزند نوستراداموس کیست.',html,pick:{none:'حدسی نمی‌زند'},btns:[{label:'ثبت حدس',needPick:true,fn:()=>{const q=cur.sel;if(q&&q.role==='nostradamus'){q.alive=false;q.revealed=true;p.alive=true;log('ذهن زیبا: حدس درست بود؛ '+p.name+' برگشت و نوستراداموس ('+q.name+') خارج شد.');step({phase:ph,title:'ذهن زیبا',script:'حدس درست بود! '+p.name+' به بازی برمی‌گردد و '+q.name+' (نوستراداموس) خارج می‌شود.',btns:[fin]})}else{log('ذهن زیبا: حدس اشتباه بود.');step({phase:ph,title:'ذهن زیبا',script:'حدس درست نبود.',btns:[fin]})}}}]});
+  else if(c==='cuff')step({phase:ph,title:'کارت حرکت آخر',script:p.name+' کارت «دستبند» را کشید و یک نفر را انتخاب می‌کند که امشب توانایی‌اش را از دست بدهد.',html,pick:{},btns:[{label:'ثبت',needPick:true,fn:()=>{G.cuffed=cur.sel;log('دستبند: '+cur.sel.name+' امشب توانایی ندارد.');go()}}]});
+  return true;
 }
 
 /* ---------- win ---------- */
 function checkWin(){
-  const a=alive();const m=a.filter(p=>team(p)==='m').length,c=a.length-m;
+  const a=alive();const m=a.filter(p=>sideOf(p)==='m').length,c=a.filter(p=>sideOf(p)==='c').length;
   let w=null;if(m===0)w='c';else if(m>=c)w='m';
   if(!w)return false;
   clearInterval(tid);beep(523,.2);setTimeout(()=>beep(659,.2),200);setTimeout(()=>beep(784,.4),400);
