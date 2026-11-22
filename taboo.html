@@ -70,6 +70,37 @@ input[type=text]:focus{border-color:var(--accent)}
 .icon{border:0;background:var(--card2);color:var(--text);width:40px;height:40px;border-radius:12px;font-size:18px;cursor:pointer;font-family:inherit}
 p{line-height:1.9}
 
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{overflow-x:clip;overscroll-behavior-y:none}
+.big,h1,.prompt,.w{overflow-wrap:anywhere}
+h1{font-size:clamp(23px,7vw,30px)}
+.emoji{font-size:clamp(42px,13vw,58px)}
+.btn{font-size:clamp(16px,4.7vw,19px);padding:clamp(12px,3.6vw,17px)}
+.btn.small{font-size:14px;padding:10px;font-weight:600}
+.card{padding:clamp(12px,3.6vw,16px)}
+.timer{font-size:clamp(54px,19vw,84px)}
+.lbl{font-size:clamp(14px,4.2vw,16px)}
+.modal .card{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.sheetBtns{display:flex;flex-direction:column;gap:10px}
+.gmb{font-size:20px;flex:none}
+.topbar{gap:8px;min-height:40px}
+.rctl{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px;margin-top:10px;font-size:12.5px}
+.rbtns{display:flex;gap:6px}
+.mini-btn{border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:999px;padding:5px 11px;font-family:inherit;font-size:13px;cursor:pointer}
+.name{padding:0;gap:0;overflow:hidden}
+.name .nt{display:flex;align-items:center;gap:6px;border:0;background:transparent;color:inherit;font-family:inherit;font-size:15px;padding:7px 12px 7px 6px;cursor:pointer;width:auto;height:auto;border-radius:0}
+.name .ck{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);font-size:12px}
+.name.on{border-color:var(--accent)}.name.on .ck{background:var(--accent);border-color:var(--accent);color:#fff}
+.name.off{opacity:.5}.name.off .nm{text-decoration:line-through}
+.name .ne{border:0;border-right:1px solid var(--line);background:transparent;color:var(--muted);width:auto;height:auto;border-radius:0;padding:7px 10px;font-size:14px;cursor:pointer}
+@media (max-height:700px){.screen{gap:10px}.reveal{padding:16px 14px;gap:8px}.emoji{font-size:44px}h1{font-size:23px;margin-top:0}.sub{font-size:14px}.btn{padding:12px}}
+@media (max-height:600px){.emoji{font-size:36px}.big{font-size:clamp(26px,8vw,34px)}.timer{font-size:52px}.reveal{min-height:0!important}}
+@media (max-width:340px){.stepper button{width:34px;height:34px}.chip{padding:7px 11px;font-size:14px}}
+
+.actbar{position:sticky;bottom:0;z-index:3;display:flex;flex-direction:column;gap:10px;padding-top:12px;background:linear-gradient(to top,var(--bg) 78%,rgba(19,17,28,0))}
+@media (max-height:640px){.reveal p{font-size:13.5px;line-height:1.7}.card{padding:10px 12px}.li{padding:8px 12px}.screen{gap:8px}.topbar{min-height:36px}.icon{width:36px;height:36px}}
+@media (max-height:600px){.pad{min-height:104px!important;height:24vh!important}.pad3{min-height:84px!important}.tcard{padding:10px!important;gap:6px!important}.forb div{padding:4px!important;font-size:17px!important}.prompt{font-size:22px}}
+
 .home{display:flex;align-items:center;justify-content:center;text-decoration:none}
 
 :root{--accent:#2563eb;--accent2:#db2777;--glow:rgba(37,99,235,.28)}
@@ -141,7 +172,7 @@ p{line-height:1.9}
   <div class="card center"><div class="muted">امتیاز این دور</div><div class="mini" id="reScore"></div><div class="muted" style="font-size:13px">برای اصلاح، روی هر کلمه بزنید: درست ← رد ← خطا</div></div>
   <div class="list" id="reList"></div>
   <div class="grow"></div>
-  <button class="btn primary" id="nextTeamBtn">ثبت امتیاز ✓</button>
+  <div class="actbar"><button class="btn primary" id="nextTeamBtn">ثبت امتیاز ✓</button></div>
 </section>
 
 <section class="screen" id="final">
@@ -185,7 +216,54 @@ let _ac;
 function beep(f=880,d=.15,v=.25){try{_ac=_ac||new(window.AudioContext||window.webkitAudioContext)();if(_ac.state==='suspended')_ac.resume();const o=_ac.createOscillator(),g=_ac.createGain();o.type='sine';o.frequency.value=f;o.connect(g);g.connect(_ac.destination);const t=_ac.currentTime;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.start(t);o.stop(t+d)}catch(e){}}
 function stepper(el,min,max,val,on){el.innerHTML='<button type="button">+</button><span></span><button type="button">−</button>';const sp=el.querySelector('span');const st={v:val,min,max,set(x){st.v=Math.max(st.min,Math.min(st.max,x));sp.textContent=fa(st.v);on&&on(st.v)}};const [p,m]=el.querySelectorAll('button');p.onclick=()=>st.set(st.v+1);m.onclick=()=>st.set(st.v-1);st.set(val);return st}
 function fmt(s){s=Math.max(0,s);return fa(Math.floor(s/60))+':'+fa(String(s%60).padStart(2,'0'))}
-function namesEditor(input,addBtn,box,key,min){let names=store.get('players',null)||store.get(key,[]);function render(){box.innerHTML='';names.forEach((n,i)=>{const d=document.createElement('div');d.className='name';d.innerHTML='<span></span><button type="button">✕</button>';d.firstChild.textContent=n;d.lastChild.onclick=()=>{names.splice(i,1);save()};box.appendChild(d)});ed.onchange&&ed.onchange(names)}function save(){store.set('players',names);render()}function add(){const v=input.value.trim();if(!v)return;v.split(/[،,\n]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{if(!names.includes(s))names.push(s)});input.value='';save();input.focus()}addBtn.onclick=add;input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});const ed={get names(){return names},render,onchange:null};setTimeout(render);return ed}
+function namesEditor(input,addBtn,box,key){
+ let R=store.get('roster',null);
+ if(!Array.isArray(R)){const old=store.get('players',null)||store.get(key,[]);R=(old||[]).map(n=>({n,on:true}))}
+ const ctr=document.createElement('div');ctr.className='rctl';box.parentNode.insertBefore(ctr,box);
+ function save(){store.set('roster',R);render()}
+ function render(){
+  box.innerHTML='';
+  R.forEach((p,i)=>{const d=document.createElement('div');d.className='name'+(p.on?' on':' off');
+   d.innerHTML='<button type="button" class="nt" aria-pressed="'+p.on+'"><span class="ck">'+(p.on?'✓':'')+'</span><span class="nm"></span></button><button type="button" class="ne" aria-label="ویرایش">✎</button>';
+   d.querySelector('.nm').textContent=p.n;
+   d.querySelector('.nt').onclick=()=>{p.on=!p.on;save()};
+   d.querySelector('.ne').onclick=()=>editName(i);
+   box.appendChild(d)});
+  const a=R.filter(p=>p.on).length;
+  ctr.innerHTML=R.length?'<span class="muted">'+fa(a)+' از '+fa(R.length)+' نفر فعال · برای فعال/غیرفعال کردن روی اسم بزنید</span><span class="rbtns"><button type="button" class="mini-btn" data-a="1">همه</button><button type="button" class="mini-btn" data-a="0">هیچ‌کدام</button></span>':'';
+  ctr.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{R.forEach(p=>p.on=b.dataset.a==='1');save()});
+  ed.onchange&&ed.onchange(ed.names)}
+ function add(){const v=input.value.trim();if(!v)return;v.split(/[،,\n]/).map(s=>s.trim()).filter(Boolean).forEach(s=>{const f=R.find(p=>p.n===s);if(f)f.on=true;else R.push({n:s,on:true})});input.value='';save();input.focus()}
+ function editName(i){const p=R[i];sheet({title:'ویرایش اسم',input:p.n,buttons:[
+   {label:'ذخیره',cls:'primary',fn:v=>{v=(v||'').trim();if(v&&!R.some((q,k)=>k!==i&&q.n===v))p.n=v;save()}},
+   {label:'حذف این اسم',cls:'bad',confirm:'«'+p.n+'» از فهرست حذف شود؟',fn:()=>{R.splice(i,1);save()}},
+   {label:'انصراف',cls:'ghost'}]})}
+ addBtn.onclick=add;input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
+ const ed={get names(){return R.filter(p=>p.on).map(p=>p.n)},get all(){return R},render,onchange:null};setTimeout(render);return ed}
+function sheet(o){let m=document.getElementById('sheetM');if(!m){m=document.createElement('div');m.className='modal';m.id='sheetM';m.innerHTML='<div class="card"></div>';document.body.appendChild(m);m.addEventListener('click',e=>{if(e.target===m)close()})}
+ const c=m.firstChild;c.innerHTML='';const close=()=>{m.classList.remove('on');o.onclose&&o.onclose()};
+ const h=document.createElement('h2');h.textContent=o.title;c.appendChild(h);
+ if(o.text){const p=document.createElement('p');p.className='muted';p.style.margin='0 0 12px';p.textContent=o.text;c.appendChild(p)}
+ let inp=null;if(o.input!=null){inp=document.createElement('input');inp.type='text';inp.value=o.input;inp.style.marginBottom='12px';c.appendChild(inp)}
+ const col=document.createElement('div');col.className='sheetBtns';c.appendChild(col);
+ o.buttons.forEach(b=>{const x=document.createElement('button');x.type='button';x.className='btn '+(b.cls||'');x.textContent=b.label;
+  x.onclick=()=>{if(b.confirm){sheet({title:b.confirm,text:b.confirmText||'',buttons:[{label:b.yes||'بله',cls:'bad',fn:()=>{b.fn&&b.fn(inp&&inp.value)}},{label:'نه، برگرد',cls:'ghost',stay:true,fn:()=>sheet(o)}],onclose:o.onclose});return}
+   if(b.stay){b.fn&&b.fn();return}close();b.fn&&b.fn(inp&&inp.value)};col.appendChild(x)});
+ m.classList.add('on')}
+let _gm=null;
+function gameMenu(opts){_gm=opts;
+ document.querySelectorAll('section.screen').forEach(sc=>{if(sc.id==='setup'||sc.dataset.nomenu!=null)return;
+  let tb=sc.querySelector(':scope > .topbar');if(!tb){tb=document.createElement('div');tb.className='topbar';tb.innerHTML='<span></span>';sc.prepend(tb)}
+  tb.querySelectorAll('.icon').forEach(b=>{if(b.textContent.trim()==='✕')b.remove()});
+  const b=document.createElement('button');b.type='button';b.className='icon gmb';b.setAttribute('aria-label','منو');b.textContent='☰';b.onclick=openGameMenu;tb.appendChild(b)})}
+function openGameMenu(){const o=_gm||{};o.pause&&o.pause();
+ const btns=[{label:'▶️ ادامه‌ی بازی',cls:'primary'}];
+ if(o.restart)btns.push({label:'🔄 شروع دوباره',confirm:'بازی از اول شروع شود؟',confirmText:o.restartText||'امتیازها و وضعیت فعلی پاک می‌شود.',yes:'بله، از اول',fn:()=>{o.stop&&o.stop();o.restart()}});
+ btns.push({label:'⚙️ برگشت به تنظیمات بازی',confirm:'از این دور خارج شوید؟',confirmText:'وضعیت فعلی بازی پاک می‌شود.',yes:'بله، خروج',fn:()=>{o.stop&&o.stop();(o.setup||(()=>show('setup')))()}});
+ btns.push({label:'🏠 صفحه‌ی اصلی بازی‌ها',cls:'ghost',confirm:'به صفحه‌ی اصلی بروید؟',confirmText:'بازی فعلی بسته می‌شود.',yes:'بله، برو',fn:()=>{o.stop&&o.stop();location.href='./'}});
+ sheet({title:'منوی بازی',buttons:btns,onclose:()=>{o.resume&&o.resume()}})}
+function settingsReset(keys,after){const s=document.getElementById('setup');if(!s)return;const b=document.createElement('button');b.type='button';b.className='btn ghost small';b.textContent='↺ برگرداندن تنظیمات به حالت پیش‌فرض';
+ b.onclick=()=>sheet({title:'تنظیمات پیش‌فرض',text:'تنظیمات این بازی به حالت اول برمی‌گردد. فهرست اسم‌ها پاک نمی‌شود.',buttons:[{label:'بازنشانی',cls:'bad',fn:()=>{keys.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});location.reload()}},{label:'انصراف',cls:'ghost'}]});s.appendChild(b)}
 
 const CARDS=[
 ['پیتزا','پنیر','ایتالیا','خمیر','گرد'],['فوتبال','توپ','دروازه','گل','بازیکن'],['دندانپزشک','دندان','دکتر','مسواک','درد'],['نوروز','عید','سال','بهار','هفت‌سین'],
@@ -217,7 +295,7 @@ const TN=stepper($('#sTeams'),2,4,saved.n,renderTeams);
 function renderTeams(n){const box=$('#teamNames');if(!box)return;box.innerHTML='';for(let i=0;i<n;i++){const d=document.createElement('div');d.className='teamIn';const inp=document.createElement('input');inp.type='text';inp.value=teamNames[i]||('تیم '+fa(i+1));inp.oninput=()=>teamNames[i]=inp.value;d.appendChild(inp);box.appendChild(d)}}
 renderTeams(TN.v);
 
-let used=new Set(store.get('tbUsed',[])),deck=[],G,R,tid;
+let used=new Set(store.get('tbUsed',[])),deck=[],G,R,tid,cdIv=null;
 function buildDeck(){let fresh=CARDS.filter(c=>!used.has(c[0]));if(fresh.length<10){used.clear();fresh=CARDS;store.set('tbUsed',[])}deck=shuffle(fresh)}
 $('#startBtn').onclick=()=>{
   store.set('tb',{t:secs,n:TN.v,names:teamNames});
@@ -238,7 +316,7 @@ $('#finishBtn').onclick=()=>{
 };
 $('#goBtn').onclick=()=>{
   show('cd');let c=3;$('#cdNum').textContent=fa(c);beep(520,.15);
-  const iv=setInterval(()=>{c--;if(c>0){$('#cdNum').textContent=fa(c);beep(520,.15)}else{clearInterval(iv);beep(880,.3);startRound()}},1000);
+  clearInterval(cdIv);cdIv=setInterval(()=>{c--;if(c>0){$('#cdNum').textContent=fa(c);beep(520,.15)}else{clearInterval(cdIv);beep(880,.3);startRound()}},1000);
 };
 function nextCard(){
   if(!deck.length)buildDeck();
@@ -252,7 +330,9 @@ function startRound(){
   R={left:secs,items:[],locked:false};
   $('#clock').textContent=fmt(R.left);$('#clock').style.color='';$('#liveScore').textContent='امتیاز: '+fa(0);
   nextCard();show('play');
-  tid=setInterval(()=>{R.left--;$('#clock').textContent=fmt(R.left);
+  runTick();
+}
+function runTick(){clearInterval(tid);tid=setInterval(()=>{R.left--;$('#clock').textContent=fmt(R.left);
     if(R.left<=5&&R.left>0){beep(900,.07);$('#clock').style.color='var(--bad)'}
     if(R.left<=0){clearInterval(tid);beep(300,.7);endRound()}},1000);
 }
@@ -274,6 +354,8 @@ function renderRE(){
   const sc=score();$('#reScore').textContent=sc<0?'−'+fa(-sc):fa(sc);
 }
 $('#nextTeamBtn').onclick=()=>{G.teams[G.cur].score+=score();G.cur=(G.cur+1)%G.teams.length;if(G.cur===0)G.round++;showTurn()};
+gameMenu({restart:()=>$('#startBtn').onclick(),restartText:'امتیاز همه‌ی تیم‌ها صفر می‌شود.',stop:()=>{clearInterval(tid);clearInterval(cdIv);if(R)R.left=0},pause:()=>{if($('#play').classList.contains('on'))clearInterval(tid)},resume:()=>{if($('#play').classList.contains('on')&&R&&R.left>0)runTick()}});
+settingsReset(['tb']);
 </script>
 
 <script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
